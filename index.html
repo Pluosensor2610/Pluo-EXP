@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ctrl12 — Riego</title>
+<title>Ctrl12 — Mi Riego</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -446,8 +446,8 @@ p { margin: 0; }
     <div class="logo-wrap">
       <div class="logo-circulo">CTRL12</div>
     </div>
-    <h1 class="login-titulo">Controlador 12</h1>
-    <p class="login-sub">Riego inteligente — control de 12 salidas</p>
+    <h1 class="login-titulo">Mi Riego</h1>
+    <p class="login-sub">Control de riego — 12 salidas</p>
 
     <form id="formLogin">
       <div class="campo">
@@ -775,7 +775,6 @@ function renderDetalle() {
     <div class="tabs">
       <button class="tab ${tabActual==='control'?'activo':''}" onclick="cambiarTab('control')">Control</button>
       <button class="tab ${tabActual==='programas'?'activo':''}" onclick="cambiarTab('programas')">Programas</button>
-      <button class="tab ${tabActual==='salidas'?'activo':''}" onclick="cambiarTab('salidas')">Salidas</button>
     </div>
     <div id="contenido-tab"></div>
   `;
@@ -796,7 +795,6 @@ function renderTab() {
   if (!ct) return;
   if (tabActual === 'control')   ct.innerHTML = htmlControl();
   if (tabActual === 'programas') ct.innerHTML = htmlProgramas();
-  if (tabActual === 'salidas')   ct.innerHTML = htmlSalidas();
   bindControl();
 }
 
@@ -1063,57 +1061,6 @@ window.guardarProgUI = async function() {
   }
 
   toast(`Programa ${progActual} guardado ✓`);
-};
-
-/* =====================================================
-   TAB SALIDAS (CONFIG)
-   ===================================================== */
-const TIPOS = [
-  { v:'0', l:'Bomba' }, { v:'1', l:'Válvula' },
-  { v:'4', l:'Auxiliar' }, { v:'5', l:'Monitor' }
-];
-
-function htmlSalidas() {
-  return `
-    <div class="card">
-      <div class="card-titulo">Configuración de salidas</div>
-      <p class="txt-tenue" style="margin-bottom:14px">Salidas 1-6: Placa 1 &nbsp;|&nbsp; Salidas 7-12: Placa 2</p>
-      ${[...Array(12)].map((_,i) => {
-        const s = i+1;
-        const data = salidas[String(s)] || { nombre:`Sector ${s}`, tipo:1 };
-        const p2 = s > 6;
-        return `
-          <div class="salida-row">
-            <div class="salida-num ${p2?'p2':''}">${s}</div>
-            <div class="salida-campo">
-              <input type="text" id="sal-nom-${s}" value="${data.nombre||''}" placeholder="Nombre">
-            </div>
-            <div class="salida-campo">
-              <select id="sal-tipo-${s}">
-                ${TIPOS.map(t=>`<option value="${t.v}" ${String(data.tipo)===t.v?'selected':''}>${t.l}</option>`).join('')}
-              </select>
-              <div class="salida-sub">${p2?'Placa 2':'Placa 1'}</div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-      <button class="btn-primario" style="margin-top:16px" onclick="guardarSalidas()">Guardar salidas</button>
-    </div>
-  `;
-}
-
-window.guardarSalidas = async function() {
-  for (let s = 1; s <= 12; s++) {
-    const nom  = document.getElementById(`sal-nom-${s}`)?.value  || `Sector ${s}`;
-    const tipo = document.getElementById(`sal-tipo-${s}`)?.value || '1';
-    const data = { nombre: nom, tipo: parseInt(tipo), placa: s<=6?1:2 };
-    salidas[String(s)] = data;
-    await guardarSalida(s, data);
-    // Enviar SETSALIDA por MQTT
-    enviarCmdOp(`SETSALIDA:${s},${tipo},${s},${nom}`);
-  }
-  toast('Salidas guardadas ✓');
-  // Refrescar nombres en tab control si se cambia después
 };
 
 /* ---------- CARGAR MQTT.JS CDN ---------- */
