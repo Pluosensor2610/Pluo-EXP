@@ -493,11 +493,11 @@ p { margin: 0; }
      FIREBASE + LÓGICA
      ===================================================== -->
 <script type="module">
-import { initializeApp }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp }             from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+                                     from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, getDocs, collection, setDoc, query, where }
-                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+                                     from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 /* ---------- CONFIG FIREBASE ---------- */
 const firebaseConfig = {
@@ -564,10 +564,13 @@ document.getElementById('estadoCnx').textContent = 'firebase: ok';
 
 onAuthStateChanged(auth, async user => {
   if (user) {
-    mostrarApp();
+    pLogin.classList.remove('activa');
+    pApp.classList.add('activa');
     await cargarUnidades(user);
   } else {
-    mostrarLogin();
+    pLogin.classList.add('activa');
+    pApp.classList.remove('activa');
+    document.getElementById('estadoCnx').textContent = 'firebase: ok';
   }
 });
 
