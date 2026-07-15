@@ -6,6 +6,7 @@
 <title>Ctrl12 — Mi Riego</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js"></script>
 <style>
 /* =====================================================
    TOKENS
@@ -1065,7 +1066,9 @@ window.guardarProgUI = async function() {
 
 /* ---------- CARGAR MQTT.JS CDN ---------- */
 const mqttScript = document.createElement('script');
-mqttScript.src = 'https://unpkg.com/mqtt/dist/mqtt.min.js';
+mqttScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js';
+mqttScript.onload = () => console.log('MQTT listo');
+mqttScript.onerror = () => console.warn('MQTT no disponible');
 document.head.appendChild(mqttScript);
 
 </script>
