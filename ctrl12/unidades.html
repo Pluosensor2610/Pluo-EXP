@@ -52,3 +52,88 @@
     messagingSenderId: "443227636027",
     appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
   };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    signOut(auth).then(() => window.location.href = './index.html');
+  });
+
+  function normalizarClienteRef(ref) {
+    if (!ref) return '';
+    if (typeof ref === 'object' && ref.referencePath) {
+      return ref.referencePath;
+    }
+    if (typeof ref === 'object' && ref.path) {
+      return ref.path;
+    }
+    if (typeof ref === 'string') {
+      return ref.startsWith('/') ? ref.substring(1) : ref;
+    }
+    return '';
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = './index.html';
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, 'Users', user.uid));
+      if (!userDoc.exists()) throw new Error('Usuario no encontrado');
+
+      const userData = userDoc.data();
+      const clienteRefNormalizado = normalizarClienteRef(userData.cliente_ref);
+
+      if (!clienteRefNormalizado) throw new Error('cliente_ref no configurado');
+
+      // Query SOLO por tipo, sin cliente_ref
+      const q = query(collection(db, 'Unidades'), where('tipo', '==', 'ctrl12'));
+      const unidadesSnap = await getDocs(q);
+
+      document.getElementById('cargando').style.display = 'none';
+
+      // Filtrar en cliente por cliente_ref normalizado
+      const unidadesFiltradas = unidadesSnap.docs.filter(doc => {
+        const unitClienteRef = normalizarClienteRef(doc.data().cliente_ref);
+        return unitClienteRef === clienteRefNormalizado;
+      });
+
+      if (unidadesFiltradas.length === 0) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'No hay unidades CTRL12 asignadas';
+        return;
+      }
+
+      const grid = document.getElementById('grid');
+      grid.style.display = 'grid';
+
+      unidadesFiltradas.forEach(docSnap => {
+        const data = docSnap.data();
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'tarjeta';
+        tarjeta.innerHTML = `
+          <h2 class="tarjeta-titulo">${data.nombre || 'Sin nombre'}</h2>
+          <p class="tarjeta-meta">ID: ${data.device_id}</p>
+          <p class="tarjeta-meta">Tipo: ${data.tipo}</p>
+          <span class="tarjeta-estado ${data.conectado ? 'estado-online' : 'estado-offline'}">
+            ${data.conectado ? 'En línea' : 'Sin conexión'}
+          </span>
+        `;
+        tarjeta.addEventListener('click', () => window.location.href = `./equipo.html?id=${data.device_id}`);
+        grid.appendChild(tarjeta);
+      });
+
+    } catch (err) {
+      document.getElementById('cargando').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = `Error: ${err.message}`;
+    }
+  });
+</script>
+
+</body>
+</html>
