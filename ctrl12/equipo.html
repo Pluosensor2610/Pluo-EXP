@@ -3,568 +3,284 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ctrl12 — Equipo</title>
+<title>Control Equipo — CTRL12</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --azul:       #1976D2;
-    --teal:       #00897B;
-    --teal-light: #E0F2F1;
-    --verde:      #2FB65A;
-    --gris:       #B9C2C6;
-    --naranja:    #E65100;
-    --alerta:     #E24C4C;
-    --texto:      #1A2B33;
-    --texto-tenue:#6B7C85;
-    --blanco:     #FFFFFF;
-    --fondo:      #F4F7F9;
-  }
-
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
-  button { cursor: pointer; font-family: 'Manrope', sans-serif; }
-
-  header {
-    background: var(--azul); color: var(--blanco);
-    padding: 16px 20px; display: flex; align-items: center; gap: 12px;
-    position: sticky; top: 0; z-index: 10;
-  }
-  #btnVolver {
-    background: rgba(255,255,255,0.15); border: none; color: var(--blanco);
-    width: 34px; height: 34px; border-radius: 8px; font-size: 18px; flex-shrink: 0;
-  }
-  header .titulos { flex: 1; min-width: 0; }
-  header h1 { font-size: 16px; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  header p  { font-size: 11px; margin: 0; opacity: 0.85; font-family: 'IBM Plex Mono', monospace; }
-  .punto-conexion { width: 10px; height: 10px; border-radius: 50%; background: var(--gris); flex-shrink: 0; }
-  .punto-conexion.conectado { background: var(--verde); }
-
-  main { max-width: 480px; margin: 0 auto; padding: 16px; }
-
-  /* SECTORES */
-  .grid-sectores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-  .tarjeta-sector {
-    background: var(--blanco); border-radius: 12px;
-    padding: 12px 6px; text-align: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    position: relative;
-  }
-  .badge-p2 {
-    position: absolute; top: 5px; right: 5px;
-    font-size: 8px; font-weight: 700; color: var(--naranja);
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  .tarjeta-sector .nombre {
-    font-size: 11px; font-weight: 700; margin-bottom: 8px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .circulo-icono {
-    width: 48px; height: 48px; border-radius: 50%;
-    background: var(--gris); margin: 0 auto 8px auto;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s ease;
-  }
-  .circulo-icono svg { width: 28px; height: 28px; }
-  .tarjeta-sector .estado-texto { font-size: 10px; color: var(--texto-tenue); }
-
-  /* TARJETA ESTADO */
-  .tarjeta-card {
-    background: var(--blanco); border-radius: 12px;
-    padding: 16px; margin-top: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  .tarjeta-card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-tenue); margin: 0 0 12px 0; }
-  .fila-estado { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #F0F0F0; }
-  .fila-estado:last-child { border-bottom: none; }
-  .fila-estado span:first-child { color: var(--texto-tenue); }
-  .fila-estado span:last-child  { color: var(--texto); font-weight: 600; }
-  .barra-progreso { height: 6px; background: #E0E0E0; border-radius: 3px; margin-top: 10px; overflow: hidden; }
-  .barra-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 1s linear; }
-
-  /* BOTONES CONTROL */
-  .botones-control { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-  .btn-ctrl {
-    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700;
-    border: 1px solid var(--gris); background: var(--blanco); color: var(--texto);
-  }
-  .btn-ctrl.primario { background: var(--teal); color: #fff; border-color: var(--teal); }
-  .btn-ctrl.peligro  { color: var(--alerta); border-color: rgba(226,76,76,0.3); }
-  .btn-ctrl:disabled { opacity: 0.4; }
-
-  /* RIEGO MANUAL */
-  .manual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-  .btn-sector-manual {
-    padding: 8px 4px; border-radius: 8px; font-size: 11px; font-weight: 700;
-    border: 1px solid var(--gris); background: var(--blanco); color: var(--texto); text-align: center;
-  }
-  .btn-sector-manual.p2 { border-style: dashed; }
-  .btn-sector-manual.sel { background: var(--teal); color: #fff; border-color: var(--teal); }
-  .fila-manual { display: flex; align-items: center; gap: 8px; }
-  .fila-manual label { font-size: 13px; font-weight: 600; color: var(--texto-tenue); white-space: nowrap; }
-  .input-min {
-    width: 70px; padding: 8px; text-align: center;
-    border: 1px solid var(--gris); border-radius: 8px;
-    font-size: 15px; font-weight: 700; outline: none; background: var(--fondo);
-  }
-  .input-min:focus { border-color: var(--teal); }
-
-  /* SECCION DESPLEGABLE */
-  .seccion {
-    background: var(--blanco); border-radius: 12px;
-    margin-top: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden;
-  }
-  .seccion .cabecera {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; cursor: pointer; user-select: none;
-  }
-  .seccion .cabecera h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-tenue); margin: 0; }
-  .seccion .flecha { color: var(--texto-tenue); font-size: 14px; transition: transform 0.2s; }
-  .seccion.abierta .flecha { transform: rotate(180deg); }
-  .seccion .cuerpo { display: none; padding: 0 16px 16px; }
-  .seccion.abierta .cuerpo { display: block; }
-
-  /* PROGRAMAS */
-  .tabs-prog { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-  .tab-prog {
-    padding: 6px 12px; border: 1px solid var(--gris); border-radius: 20px;
-    font-size: 12px; font-weight: 700; background: var(--blanco); color: var(--texto-tenue);
-  }
-  .tab-prog.activo { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
-
-  .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
-  .switch-label { font-size: 13px; font-weight: 600; }
-  .switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
-  .switch input { opacity: 0; width: 0; height: 0; }
-  .switch-track { position: absolute; inset: 0; border-radius: 11px; background: #CCC; transition: background 0.2s; }
-  .switch input:checked + .switch-track { background: var(--teal); }
-  .switch-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
-  .switch input:checked ~ .switch-thumb { transform: translateX(18px); }
-
-  .campo-hora { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
-  .campo-hora label { font-size: 13px; font-weight: 600; }
-  .campo-hora input { width: 90px; padding: 7px; text-align: center; border: 1px solid var(--gris); border-radius: 8px; font-size: 14px; font-weight: 700; outline: none; }
-  .campo-hora input:focus { border-color: var(--teal); }
-
-  .dias-wrap { display: flex; gap: 5px; padding: 8px 0; flex-wrap: wrap; border-bottom: 1px solid #F0F0F0; }
-  .dia-chip { padding: 5px 9px; border: 1px solid var(--gris); border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--texto-tenue); cursor: pointer; user-select: none; }
-  .dia-chip.sel { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
-
-  .sector-row { display: grid; grid-template-columns: 28px 1fr 56px 56px; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
-  .sector-row:last-child { border-bottom: none; }
-  .sector-nombre { font-size: 12px; font-weight: 600; }
-  .dur-inp { width: 100%; padding: 6px; text-align: center; border: 1px solid var(--gris); border-radius: 6px; font-size: 13px; font-weight: 700; outline: none; }
-  .dur-inp:focus { border-color: var(--teal); }
-  .dur-inp:disabled { opacity: 0.35; background: #F5F5F5; }
-
-  .btns-prog { display: flex; gap: 8px; margin-top: 12px; }
-  .btn-guardar { flex: 1; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
-  .btn-iniciar-prog { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
-
-  /* HISTORIAL */
-  .fila-historial { padding: 10px 0; border-bottom: 1px solid #F0F0F0; }
-  .fila-historial:last-child { border-bottom: none; }
-  .fila-historial .linea1 { font-size: 13px; font-weight: 700; }
-  .fila-historial .linea2 { font-size: 11px; color: var(--texto-tenue); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
-
-  /* TOAST */
-  .toast-guardado {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--texto); color: var(--blanco); padding: 10px 18px;
-    border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none;
-    transition: opacity 0.25s ease; z-index: 100;
-  }
-  .toast-guardado.visible { opacity: 1; }
-
-  .msg-cargando { text-align: center; color: var(--texto-tenue); padding: 40px 20px; font-size: 14px; }
-  .badge-placa2 { display: inline-block; font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; padding: 2px 6px; border-radius: 10px; background: rgba(230,81,0,0.12); color: var(--naranja); margin-left: 4px; }
-  .badge-placa2.ok { background: rgba(47,182,90,0.12); color: var(--verde); }
+  :root { --teal: #00897B; --texto: #1A2B33; --texto-tenue: #6B7C85; --fondo: #F5F7FA; --rojo: #C62828; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
+  .header { background: #fff; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .btn-volver { padding: 10px 16px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer; font-family: 'Manrope', sans-serif; }
+  .contenedor { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+  .tab { padding: 12px 16px; background: none; border: none; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 600; color: var(--texto-tenue); border-bottom: 3px solid transparent; }
+  .tab.activo { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab-content { display: none; }
+  .tab-content.activo { display: block; }
+  .grid-sectores { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-bottom: 30px; }
+  .sector-card { background: #fff; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid #e0e0e0; }
+  .sector-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .sector-card.activo { border-color: var(--teal); background: rgba(0,137,123,0.05); }
+  .sector-icon { font-size: 40px; margin: 10px 0; }
+  .sector-nombre { font-weight: 700; margin: 8px 0; }
+  .sector-estado { font-size: 12px; color: var(--texto-tenue); }
+  .estado-live { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .estado-fila { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
+  .estado-fila:last-child { border-bottom: none; }
+  .estado-label { color: var(--texto-tenue); font-weight: 600; }
+  .estado-valor { font-weight: 700; color: var(--texto); }
+  .botones { display: flex; gap: 10px; }
+  button { padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 600; }
+  .btn-primario { background: var(--teal); color: #fff; }
+  .btn-primario:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secundario { background: #f0f0f0; color: var(--texto); }
+  .programs { background: #fff; border-radius: 12px; padding: 20px; }
+  .programa-item { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 12px; }
+  .programa-titulo { font-weight: 700; margin-bottom: 8px; }
+  .programa-meta { font-size: 12px; color: var(--texto-tenue); }
 </style>
 </head>
 <body>
 
-<header>
-  <button id="btnVolver" onclick="window.location.href='unidades.html'">‹</button>
-  <div class="titulos">
-    <h1 id="nombreEquipo">Cargando…</h1>
-    <p id="idEquipo">—</p>
+<div class="header">
+  <h1 id="nombreEquipo">Cargando...</h1>
+  <button class="btn-volver" onclick="window.location.href='./unidades.html'">← Volver</button>
+</div>
+
+<div class="contenedor">
+  <div class="tabs">
+    <button class="tab activo" onclick="cambiarTab('sectores')">Control Manual</button>
+    <button class="tab" onclick="cambiarTab('programas')">Programas</button>
+    <button class="tab" onclick="cambiarTab('estado')">Estado en Vivo</button>
   </div>
-  <div class="punto-conexion" id="puntoConexion"></div>
-</header>
 
-<main id="main">
-  <p class="msg-cargando">Conectando…</p>
-</main>
+  <!-- TAB: Control Manual -->
+  <div id="sectores" class="tab-content activo">
+    <div class="grid-sectores" id="gridSectores"></div>
+  </div>
 
-<div class="toast-guardado" id="toast"></div>
+  <!-- TAB: Programas -->
+  <div id="programas" class="tab-content">
+    <div class="programs" id="listaProgramas"></div>
+  </div>
+
+  <!-- TAB: Estado en Vivo -->
+  <div id="estado" class="tab-content">
+    <div class="estado-live" id="estadoVivo"></div>
+  </div>
+</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, getDocs, setDoc, collection } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey:            "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
-    authDomain:        "pluo-compact-cef5og.firebaseapp.com",
-    projectId:         "pluo-compact-cef5og",
-    storageBucket:     "pluo-compact-cef5og.firebasestorage.app",
+    apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+    authDomain: "pluo-compact-cef5og.firebaseapp.com",
+    projectId: "pluo-compact-cef5og",
+    storageBucket: "pluo-compact-cef5og.firebasestorage.app",
     messagingSenderId: "443227636027",
-    appId:             "1:443227636027:web:c8459adcd92cec1d23f71e"
+    appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
   };
 
-  const app  = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db   = getFirestore(app);
+  const db = getFirestore(app);
 
-  /* ---------- CONFIG ---------- */
-  const MQTT_HOST = 'e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud';
-  const MQTT_USER = 'pluo_firmware';
-  const MQTT_PASS = 'Pluo2012';
-  const NUM_SECTORES = 12;
-  const DIAS_NOMBRES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  // TOKENS - CRÍTICO
+  const TOKEN_OBSERVADOR = 'OBS-CTRL-7f21';
+  const TOKEN_OPERADOR = 'OP-CTRL-4m9q';
 
-  /* ---------- ESTADO ---------- */
-  let deviceId, unidad, salidas = {}, programas = {};
-  let mqttClient, tokenOp, tokenObs;
+  // MQTT
+  let mqttClient = null;
   let estadoActual = {};
-  let sectorManualSel = 1;
-  let progActual = 1;
+  const deviceId = new URLSearchParams(window.location.search).get('id') || 'CE000001';
 
-  /* ---------- INIT ---------- */
-  const params = new URLSearchParams(window.location.search);
-  deviceId = params.get('id');
-  if (!deviceId) { window.location.href = 'unidades.html'; }
-
-  document.getElementById('idEquipo').textContent = deviceId;
-
-  onAuthStateChanged(auth, async user => {
-    if (!user) { window.location.href = 'index.html'; return; }
-    await cargarDatos();
-    renderUI();
-    conectarMQTT();
-  });
-
-  /* ---------- FIRESTORE ---------- */
-  async function cargarDatos() {
-    const snap = await getDoc(doc(db, 'Unidades', deviceId));
-    if (!snap.exists()) { window.location.href = 'unidades.html'; return; }
-    unidad = { id: deviceId, ...snap.data() };
-    tokenObs = unidad.token_observador || 'OBS-CTRL-7f21';
-    tokenOp  = 'OP-CTRL-4m9q';
-    document.getElementById('nombreEquipo').textContent = unidad.nombre || deviceId;
-
-    // Salidas
-    salidas = {};
-    const sSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Salidas'));
-    sSnap.forEach(d => { salidas[d.id] = d.data(); });
-
-    // Programas
-    programas = {};
-    const pSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Programas'));
-    pSnap.forEach(d => { programas[d.id] = d.data(); });
-    for (let p = 1; p <= 5; p++) {
-      if (!programas[String(p)]) {
-        programas[String(p)] = { activo: false, hora_inicio: '00:00', dias: [false,false,false,false,false,false,false], sectores: {} };
-      }
-      for (let s = 1; s <= NUM_SECTORES; s++) {
-        if (!programas[String(p)].sectores) programas[String(p)].sectores = {};
-        if (!programas[String(p)].sectores[String(s)]) {
-          programas[String(p)].sectores[String(s)] = { habilitado: false, horas: 0, minutos: 0 };
+  function inicializarMQTT() {
+    const hostname = 'e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud';
+    mqttClient = new Paho.MQTT.Client(hostname, 8884, 'web_' + Math.random().toString(36).substr(2, 9));
+    
+    mqttClient.onConnectionLost = () => console.log('[MQTT] Conexión perdida');
+    mqttClient.onMessageArrived = (msg) => {
+      if (msg.destinationName.includes('resp')) {
+        const payload = msg.payloadString;
+        console.log('[MQTT] Recibido:', payload);
+        if (payload.startsWith('EST:')) {
+          parsearEST(payload);
         }
       }
+    };
+
+    const options = {
+      userName: 'pluo_web_client',
+      password: 'Pluo2012',
+      useSSL: true,
+      onSuccess: () => {
+        console.log('[MQTT] Conectado');
+        mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
+        enviarComando(TOKEN_OBSERVADOR, 'GETESTADO');
+      },
+      onFailure: (err) => console.error('[MQTT] Error:', err)
+    };
+
+    mqttClient.connect(options);
+  }
+
+  function enviarComando(token, comando) {
+    if (mqttClient && mqttClient.isConnected()) {
+      const topic = `ctrl12/${deviceId}/cmd`;
+      const mensaje = `${token}:${comando}`;
+      mqttClient.send(topic, mensaje);
+      console.log('[MQTT] Enviado:', mensaje);
     }
   }
 
-  /* ---------- MQTT ---------- */
-  function pub(cmd, token) {
-    if (!mqttClient?.connected) return;
-    mqttClient.publish(`ctrl12/${deviceId}/cmd`, `${token||tokenObs}:${cmd}`);
+  function parsearEST(est) {
+    const partes = est.split(':');
+    if (partes.length >= 12) {
+      estadoActual = {
+        sector: parseInt(partes[1]),
+        programa: parseInt(partes[2]),
+        m3: parseFloat(partes[3]),
+        estado: parseInt(partes[4]),
+        elapsed: parseInt(partes[5]),
+        h_cfg: parseInt(partes[6]),
+        m_cfg: parseInt(partes[7]),
+        pausa: parseInt(partes[8]),
+        modo: parseInt(partes[9]),
+        dur_total: parseInt(partes[10]),
+        placa2: partes[11]
+      };
+      actualizarUI();
+    }
   }
 
-  function conectarMQTT() {
-    mqttClient = mqtt.connect(`wss://${MQTT_HOST}:8884/mqtt`, {
-      username: MQTT_USER, password: MQTT_PASS,
-      clientId: 'ctrl12eq_' + Math.random().toString(16).slice(2)
-    });
-
-    mqttClient.on('connect', () => {
-      document.getElementById('puntoConexion').classList.add('conectado');
-      mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
-      pub('GETESTADO');
-      setInterval(() => pub('GETESTADO'), 3000);
-    });
-
-    mqttClient.on('message', (topic, payload) => {
-      const msg = payload.toString();
-      if (msg.startsWith('EST:')) procesarEstado(msg);
-    });
-
-    mqttClient.on('error', err => {
-      console.error('MQTT:', err);
-      document.getElementById('puntoConexion').classList.remove('conectado');
-    });
+  function cambiarTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('activo'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('activo'));
+    document.getElementById(tab).classList.add('activo');
+    event.target.classList.add('activo');
   }
 
-  function procesarEstado(msg) {
-    const p = msg.split(':');
-    estadoActual = {
-      sector:   parseInt(p[1])||0,
-      programa: parseInt(p[2])||0,
-      m3:       parseFloat(p[3])||0,
-      estado:   parseInt(p[4])||0,
-      elapsed:  parseInt(p[5])||0,
-      hCfg:     parseInt(p[6])||0,
-      mCfg:     parseInt(p[7])||0,
-      pausa:    p[8]==='1',
-      modo:     parseInt(p[9])||0,
-      durTotal: parseInt(p[10])||0,
-      placa2:   p[11]||'TIMEOUT'
-    };
-    actualizarEstadoUI();
-  }
-
-  /* ---------- RENDER ---------- */
-  function renderUI() {
-    const main = document.getElementById('main');
-    main.innerHTML = `
-      <!-- GRID 12 SECTORES -->
-      <div class="grid-sectores" id="gridSectores">
-        ${[...Array(NUM_SECTORES)].map((_,i) => {
-          const s = i+1;
-          const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
-          const p2 = s > 6;
-          return `
-            <div class="tarjeta-sector" id="sect-${s}">
-              ${p2 ? '<span class="badge-p2">P2</span>' : ''}
-              <div class="nombre">${nombre}</div>
-              <div class="circulo-icono" id="circulo-${s}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
-                  <path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z"/>
-                </svg>
-              </div>
-              <div class="estado-texto" id="etxt-${s}">No activo</div>
-            </div>`;
-        }).join('')}
-      </div>
-
-      <!-- ESTADO EN VIVO -->
-      <div class="tarjeta-card">
-        <h2>Estado en vivo</h2>
-        <div id="estadoLive"><p class="msg-cargando">Esperando datos…</p></div>
-      </div>
-
-      <!-- BOTONES CONTROL -->
-      <div class="tarjeta-card">
-        <h2>Control</h2>
-        <div class="botones-control">
-          <button class="btn-ctrl" id="btnPausa" onclick="accionPausa()">Pausar</button>
-          <button class="btn-ctrl" onclick="accionSaltar()">Saltar sector</button>
-          <button class="btn-ctrl peligro" onclick="accionDetener()" style="grid-column:1/-1">Detener riego</button>
-        </div>
-      </div>
-
-      <!-- RIEGO MANUAL -->
-      <div class="seccion abierta">
-        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
-          <h2>Riego manual</h2>
-          <span class="flecha">▾</span>
-        </div>
-        <div class="cuerpo">
-          <div class="manual-grid" id="manualGrid">
-            ${[...Array(NUM_SECTORES)].map((_,i) => {
-              const s = i+1;
-              const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
-              return `<button class="btn-sector-manual ${s>6?'p2':''} ${s===1?'sel':''}" onclick="selSector(${s})">${nombre}</button>`;
-            }).join('')}
-          </div>
-          <div class="fila-manual">
-            <label>Minutos:</label>
-            <input type="number" class="input-min" id="inputMin" value="5" min="1" max="240">
-            <button class="btn-ctrl primario" style="flex:1" onclick="accionManual()">Iniciar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PROGRAMAS -->
-      <div class="seccion">
-        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
-          <h2>Programas de riego</h2>
-          <span class="flecha">▾</span>
-        </div>
-        <div class="cuerpo" id="seccionProgramas">
-          ${renderProgramas()}
-        </div>
-      </div>
-
-      <!-- HISTORIAL -->
-      <div class="seccion">
-        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
-          <h2>Historial</h2>
-          <span class="flecha">▾</span>
-        </div>
-        <div class="cuerpo">
-          <button class="btn-ctrl" onclick="pedirHistorial()" style="margin-bottom:10px">Pedir registros</button>
-          <div id="listaHistorial"><p class="msg-cargando">Presiona para cargar.</p></div>
-        </div>
-      </div>
-    `;
-  }
-
-  /* ---------- ESTADO UI ---------- */
-  function actualizarEstadoUI() {
-    const e = estadoActual;
-    const estados = ['Inactivo','Regando','Falla','Config'];
-    const el = document.getElementById('estadoLive');
-    if (!el) return;
-
-    const pct = e.durTotal > 0 ? Math.min(100, Math.round(e.elapsed/e.durTotal*100)) : 0;
-    const rest = Math.max(0, e.durTotal - e.elapsed);
-    const p2cls = e.placa2 === 'OK' ? 'ok' : '';
-    const sectorNombre = e.sector > 0 ? (salidas[String(e.sector)]?.nombre || `Sector ${e.sector}`) : '—';
-
-    el.innerHTML = `
-      <div class="fila-estado"><span>Estado</span><span>${e.pausa?'Pausado':estados[e.estado]||'?'}</span></div>
-      <div class="fila-estado"><span>Sector activo</span><span>${sectorNombre}</span></div>
-      <div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>
-      <div class="fila-estado"><span>Transcurrido</span><span>${fmtSeg(e.elapsed)}</span></div>
-      <div class="fila-estado"><span>Restante</span><span>${fmtSeg(rest)}</span></div>
-      <div class="fila-estado"><span>Placa 2</span><span><span class="badge-placa2 ${p2cls}">${e.placa2}</span></span></div>
-      ${e.estado===1?`<div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div>`:''}
-    `;
-
-    // Actualizar grid sectores
-    for (let s = 1; s <= NUM_SECTORES; s++) {
-      const circulo = document.getElementById(`circulo-${s}`);
-      const etxt    = document.getElementById(`etxt-${s}`);
-      if (!circulo || !etxt) continue;
-      if (s === e.sector && e.estado === 1) {
-        circulo.style.background = 'var(--teal)';
-        etxt.textContent = e.pausa ? 'Pausado' : 'Regando';
-      } else {
-        circulo.style.background = 'var(--gris)';
-        etxt.textContent = 'No activo';
+  function actualizarUI() {
+    // Actualizar cards de sectores
+    for (let i = 1; i <= 12; i++) {
+      const card = document.getElementById(`sector${i}`);
+      if (card) {
+        const activo = estadoActual.sector === i && estadoActual.estado === 1;
+        card.classList.toggle('activo', activo);
+        const estado = activo ? 'Activo' : 'No activo';
+        card.querySelector('.sector-estado').textContent = estado;
       }
     }
 
-    // Botón pausa
-    const btnP = document.getElementById('btnPausa');
-    if (btnP) btnP.textContent = e.pausa ? 'Reanudar' : 'Pausar';
-  }
-
-  /* ---------- ACCIONES ---------- */
-  window.selSector = function(s) {
-    sectorManualSel = s;
-    document.querySelectorAll('.btn-sector-manual').forEach((b,i) => b.classList.toggle('sel', i+1===s));
-  };
-  window.accionManual  = function() { const m = document.getElementById('inputMin')?.value||5; pub(`MANUAL:${sectorManualSel},${m}`, tokenOp); mostrarToast(`Sector ${sectorManualSel} por ${m} min`); };
-  window.accionDetener = function() { pub('DETENER', tokenOp); mostrarToast('Deteniendo riego…'); };
-  window.accionSaltar  = function() { pub('SALTAR', tokenOp); mostrarToast('Saltando sector…'); };
-  window.accionPausa   = function() { pub(estadoActual.pausa?'REANUDAR':'PAUSAR', tokenOp); };
-  window.pedirHistorial = function() { pub('GETREGISTROS', tokenOp); mostrarToast('Cargando historial…'); };
-
-  /* ---------- PROGRAMAS ---------- */
-  function renderProgramas() {
-    const prog = programas[String(progActual)] || {};
-    const dias = prog.dias || [false,false,false,false,false,false,false];
-    const sects = prog.sectores || {};
-    return `
-      <div class="tabs-prog">
-        ${[1,2,3,4,5].map(p=>`<button class="tab-prog ${p===progActual?'activo':''}" onclick="selProg(${p})">Prog ${p}</button>`).join('')}
+    // Actualizar estado en vivo
+    const html = `
+      <div class="estado-fila">
+        <span class="estado-label">Sector Activo</span>
+        <span class="estado-valor">${estadoActual.sector || '-'}</span>
       </div>
-      <div class="switch-row">
-        <span class="switch-label">Activo</span>
-        <label class="switch"><input type="checkbox" id="chkActivo" ${prog.activo?'checked':''}><div class="switch-track"></div><div class="switch-thumb"></div></label>
+      <div class="estado-fila">
+        <span class="estado-label">Programa</span>
+        <span class="estado-valor">${estadoActual.programa || '-'}</span>
       </div>
-      <div class="campo-hora">
-        <label>Hora de inicio</label>
-        <input type="text" id="inputHora" value="${prog.hora_inicio||'00:00'}" maxlength="5">
+      <div class="estado-fila">
+        <span class="estado-label">Estado</span>
+        <span class="estado-valor">${estadoActual.estado === 1 ? 'Regando' : 'Parado'}</span>
       </div>
-      <div class="dias-wrap">
-        ${DIAS_NOMBRES.map((d,i)=>`<div class="dia-chip ${dias[i]?'sel':''}" onclick="this.classList.toggle('sel')">${d}</div>`).join('')}
+      <div class="estado-fila">
+        <span class="estado-label">Tiempo Transcurrido</span>
+        <span class="estado-valor">${Math.floor(estadoActual.elapsed / 60)}:${String(estadoActual.elapsed % 60).padStart(2, '0')}</span>
       </div>
-      <div style="margin-top:10px">
-        ${[...Array(NUM_SECTORES)].map((_,i) => {
-          const s = i+1;
-          const sc = sects[String(s)] || { habilitado:false, horas:0, minutos:0 };
-          const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
-          return `
-            <div class="sector-row">
-              <label class="switch" style="width:28px;height:18px">
-                <input type="checkbox" class="chk-sec" data-s="${s}" ${sc.habilitado?'checked':''} onchange="toggleSec(${s},this.checked)">
-                <div class="switch-track"></div>
-                <div class="switch-thumb" style="top:2px;left:2px;width:14px;height:14px"></div>
-              </label>
-              <span class="sector-nombre">${nombre}</span>
-              <input type="number" class="dur-inp" id="h-${s}" value="${sc.horas}" min="0" max="23" ${sc.habilitado?'':'disabled'}>
-              <input type="number" class="dur-inp" id="m-${s}" value="${sc.minutos}" min="0" max="59" ${sc.habilitado?'':'disabled'}>
-            </div>`;
-        }).join('')}
+      <div class="estado-fila">
+        <span class="estado-label">Modo</span>
+        <span class="estado-valor">${estadoActual.modo === 0 ? 'Manual' : 'Programa'}</span>
       </div>
-      <div class="btns-prog">
-        <button class="btn-guardar" onclick="guardarProg()">Guardar</button>
-        <button class="btn-iniciar-prog" onclick="pub('INICIAR:${progActual}', tokenOp); mostrarToast('Iniciando programa ${progActual}…')">Iniciar ahora</button>
+      <div class="estado-fila">
+        <span class="estado-label">Placa 2</span>
+        <span class="estado-valor">${estadoActual.placa2 || 'OK'}</span>
       </div>
     `;
+    document.getElementById('estadoVivo').innerHTML = html;
   }
 
-  window.selProg = function(p) {
-    progActual = p;
-    document.getElementById('seccionProgramas').innerHTML = renderProgramas();
-  };
-
-  window.toggleSec = function(s, on) {
-    document.getElementById(`h-${s}`).disabled = !on;
-    document.getElementById(`m-${s}`).disabled = !on;
-  };
-
-  window.guardarProg = async function() {
-    const prog = programas[String(progActual)];
-    prog.activo = document.getElementById('chkActivo')?.checked || false;
-    prog.hora_inicio = document.getElementById('inputHora')?.value || '00:00';
-
-    const chips = document.querySelectorAll('.dia-chip');
-    prog.dias = [...chips].map(c => c.classList.contains('sel'));
-
-    for (let s = 1; s <= NUM_SECTORES; s++) {
-      const hab = document.querySelector(`.chk-sec[data-s="${s}"]`)?.checked || false;
-      const h   = parseInt(document.getElementById(`h-${s}`)?.value)||0;
-      const m   = parseInt(document.getElementById(`m-${s}`)?.value)||0;
-      prog.sectores[String(s)] = { habilitado: hab, horas: h, minutos: m };
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = './index.html';
+      return;
     }
 
-    await setDoc(doc(db, 'Unidades', deviceId, 'Programas', String(progActual)), prog);
+    try {
+      // Cargar equipo
+      const equipoDoc = await getDoc(doc(db, 'Unidades', deviceId));
+      if (!equipoDoc.exists()) throw new Error('Equipo no encontrado');
 
-    const [hh, mm] = (prog.hora_inicio||'00:00').split(':');
-    pub(`SETPROG:${progActual},${prog.activo?1:0},0,${hh||0},${mm||0}`, tokenOp);
-    pub(`SETDIAS:${progActual},${prog.dias.map(d=>d?1:0).join(',')}`, tokenOp);
-    for (let s = 1; s <= NUM_SECTORES; s++) {
-      const sc = prog.sectores[String(s)];
-      pub(`SETSECTOR:${progActual},${s},${sc.habilitado?1:0},${sc.horas},${sc.minutos}`, tokenOp);
+      const equipoData = equipoDoc.data();
+      document.getElementById('nombreEquipo').textContent = equipoData.nombre || deviceId;
+
+      // Cargar salidas
+      const salidasSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Salidas'));
+      const gridSectores = document.getElementById('gridSectores');
+      gridSectores.innerHTML = '';
+
+      for (let i = 1; i <= 12; i++) {
+        const card = document.createElement('div');
+        card.className = 'sector-card';
+        card.id = `sector${i}`;
+        card.innerHTML = `
+          <div class="sector-icon">💧</div>
+          <div class="sector-nombre">Sector ${i}</div>
+          <div class="sector-estado">No activo</div>
+        `;
+        card.addEventListener('click', () => {
+          enviarComando(TOKEN_OPERADOR, `MANUAL:${i},10`);
+        });
+        gridSectores.appendChild(card);
+      }
+
+      // Cargar programas
+      const programasSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Programas'));
+      const listaProgramas = document.getElementById('listaProgramas');
+      listaProgramas.innerHTML = '';
+
+      programasSnap.forEach((doc, idx) => {
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.className = 'programa-item';
+        div.innerHTML = `
+          <div class="programa-titulo">Programa ${idx + 1}</div>
+          <div class="programa-meta">
+            ${data.activo ? '✓ Activo' : '○ Inactivo'} | ${data.hora}:${String(data.minuto).padStart(2, '0')}
+          </div>
+          <div class="botones" style="margin-top: 10px;">
+            <button class="btn-primario" onclick="enviarComando('${TOKEN_OPERADOR}', 'INICIAR:${idx + 1}')">Iniciar</button>
+            <button class="btn-secundario" onclick="enviarComando('${TOKEN_OPERADOR}', 'DETENER')">Detener</button>
+          </div>
+        `;
+        listaProgramas.appendChild(div);
+      });
+
+      // Inicializar MQTT
+      if (!mqttClient) {
+        // Cargar librería Paho MQTT
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js';
+        script.onload = inicializarMQTT;
+        document.body.appendChild(script);
+      }
+
+    } catch (err) {
+      console.error('Error:', err);
+      document.getElementById('nombreEquipo').textContent = 'Error: ' + err.message;
     }
+  });
 
-    mostrarToast(`Programa ${progActual} guardado ✓`);
-  };
-
-  /* ---------- UTILS ---------- */
-  function fmtSeg(s) {
-    const m = Math.floor(s/60); const ss = s%60;
-    return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
-  }
-
-  function mostrarToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('visible');
-    setTimeout(() => t.classList.remove('visible'), 2500);
-  }
-
-  window.mostrarToast = mostrarToast;
-  window.tokenOp = tokenOp;
-  window.pub = pub;
-
+  window.enviarComando = enviarComando;
+  window.cambiarTab = cambiarTab;
 </script>
-
-<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
 
 </body>
 </html>
