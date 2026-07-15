@@ -2,23 +2,47 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Diagnóstico CTRL12</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Unidades — CTRL12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body { font-family: monospace; padding: 20px; background: #f5f5f5; }
-  pre { background: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #ddd; max-height: 400px; }
-  .error { color: red; font-weight: bold; }
-  .ok { color: green; font-weight: bold; }
-  h2 { margin-top: 20px; }
+  :root { --teal: #00897B; --azul: #1976D2; --texto: #1A2B33; --texto-tenue: #6B7C85; --fondo: #F5F7FA; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); padding: 20px; }
+  .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px; }
+  h1 { margin: 0; font-size: 28px; }
+  .btnLogout { padding: 10px 20px; background: #C62828; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 600; }
+  .contenedor { max-width: 1200px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  .tarjeta { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .tarjeta:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+  .tarjeta-titulo { font-size: 18px; font-weight: 700; margin: 0 0 12px 0; color: var(--texto); }
+  .tarjeta-meta { font-size: 13px; color: var(--texto-tenue); margin: 4px 0; }
+  .tarjeta-estado { display: inline-block; margin-top: 12px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .estado-online { background: rgba(0,137,123,0.15); color: var(--teal); }
+  .estado-offline { background: rgba(198,40,40,0.15); color: #B71C1C; }
+  .cargando { text-align: center; padding: 40px; color: var(--texto-tenue); }
+  .error { background: rgba(198,40,40,0.10); border: 1px solid rgba(198,40,40,0.30); color: #B71C1C; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
 </style>
 </head>
 <body>
-<h1>Diagnóstico Firebase — CTRL12</h1>
-<div id="output"></div>
+
+<div class="header">
+  <h1>Mis Unidades</h1>
+  <button class="btnLogout" id="btnLogout">Salir</button>
+</div>
+
+<div class="contenedor">
+  <div id="error" class="error" style="display:none;"></div>
+  <div id="cargando" class="cargando">Cargando...</div>
+  <div id="grid" class="grid" style="display:none;"></div>
+</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
@@ -28,80 +52,3 @@
     messagingSenderId: "443227636027",
     appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
   };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const output = document.getElementById('output');
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      output.innerHTML = '<p class="error">❌ No autenticado</p>';
-      return;
-    }
-
-    try {
-      let html = `<h2>Usuario Logueado</h2>`;
-      html += `<p><strong>UID:</strong> ${user.uid}</p>`;
-      html += `<p><strong>Email:</strong> ${user.email}</p>`;
-
-      // 1. Leer Users/{uid}
-      html += `<h2>1. Verificando Users/${user.uid}</h2>`;
-      const userDoc = await getDoc(doc(db, 'Users', user.uid));
-      
-      let userData = null;
-      if (!userDoc.exists()) {
-        html += '<p class="error">❌ Documento NO existe en Users/{uid}</p>';
-      } else {
-        userData = userDoc.data();
-        html += `<p class="ok">✓ Documento encontrado</p>`;
-        html += `<h3>Contenido:</h3>`;
-        html += `<pre>${JSON.stringify(userData, null, 2)}</pre>`;
-        if (userData.cliente_ref) {
-          html += `<p><strong>cliente_ref valor:</strong> <code>"${userData.cliente_ref}"</code></p>`;
-          html += `<p><strong>cliente_ref tipo:</strong> <code>${typeof userData.cliente_ref}</code></p>`;
-        } else {
-          html += `<p class="error">❌ cliente_ref NO definido en Users/{uid}</p>`;
-        }
-      }
-
-      // 2. Leer Unidades/CE000001
-      html += `<h2>2. Verificando Unidades/CE000001</h2>`;
-      const unitDoc = await getDoc(doc(db, 'Unidades', 'CE000001'));
-      
-      if (!unitDoc.exists()) {
-        html += '<p class="error">❌ CE000001 NO existe en Unidades</p>';
-      } else {
-        const unitData = unitDoc.data();
-        html += `<p class="ok">✓ Documento encontrado</p>`;
-        html += `<h3>Contenido:</h3>`;
-        html += `<pre>${JSON.stringify(unitData, null, 2)}</pre>`;
-        html += `<p><strong>tipo:</strong> <code>"${unitData.tipo}"</code></p>`;
-        if (unitData.cliente_ref) {
-          html += `<p><strong>cliente_ref valor:</strong> <code>"${unitData.cliente_ref}"</code></p>`;
-          html += `<p><strong>cliente_ref tipo:</strong> <code>${typeof unitData.cliente_ref}</code></p>`;
-        } else {
-          html += `<p class="error">❌ cliente_ref NO definido en Unidades/CE000001</p>`;
-        }
-
-        // 3. Comparación
-        if (userData && userData.cliente_ref && unitData.cliente_ref) {
-          html += `<h2>3. Comparación</h2>`;
-          const coincide = userData.cliente_ref === unitData.cliente_ref;
-          html += `<p><strong>¿cliente_ref coinciden?</strong> <span class="${coincide ? 'ok' : 'error'}">${coincide ? '✓ SÍ' : '❌ NO'}</span></p>`;
-          if (!coincide) {
-            html += `<p class="error">Users: <code>${userData.cliente_ref}</code></p>`;
-            html += `<p class="error">Unidades: <code>${unitData.cliente_ref}</code></p>`;
-          }
-        }
-      }
-
-      output.innerHTML = html;
-    } catch (err) {
-      output.innerHTML = `<p class="error">Error: ${err.message}</p><pre>${err.stack}</pre>`;
-    }
-  });
-</script>
-
-</body>
-</html>
