@@ -1,8 +1,122 @@
 <!DOCTYPE html>
-<html>
-<head><title>TEST CTRL12</title></head>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Unidades — CTRL12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --teal: #00897B; --azul: #1976D2; --texto: #1A2B33; --texto-tenue: #6B7C85; --fondo: #F5F7FA; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); padding: 20px; }
+  .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px; }
+  h1 { margin: 0; font-size: 28px; }
+  .btnLogout { padding: 10px 20px; background: #C62828; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 600; }
+  .contenedor { max-width: 1200px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  .tarjeta { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  .tarjeta:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+  .tarjeta-titulo { font-size: 18px; font-weight: 700; margin: 0 0 12px 0; color: var(--texto); }
+  .tarjeta-meta { font-size: 13px; color: var(--texto-tenue); margin: 4px 0; }
+  .tarjeta-estado { display: inline-block; margin-top: 12px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .estado-online { background: rgba(0,137,123,0.15); color: var(--teal); }
+  .estado-offline { background: rgba(198,40,40,0.15); color: #B71C1C; }
+  .cargando { text-align: center; padding: 40px; color: var(--texto-tenue); }
+  .error { background: rgba(198,40,40,0.10); border: 1px solid rgba(198,40,40,0.30); color: #B71C1C; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+</style>
+</head>
 <body>
-<h1>FUNCIONA - VERSION 3</h1>
-<p>Si ves esto, el archivo se subio correctamente</p>
+
+<div class="header">
+  <h1>Mis Unidades</h1>
+  <button class="btnLogout" id="btnLogout">Salir</button>
+</div>
+
+<div class="contenedor">
+  <div id="error" class="error" style="display:none;"></div>
+  <div id="cargando" class="cargando">Cargando...</div>
+  <div id="grid" class="grid" style="display:none;"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+    authDomain: "pluo-compact-cef5og.firebaseapp.com",
+    projectId: "pluo-compact-cef5og",
+    storageBucket: "pluo-compact-cef5og.firebasestorage.app",
+    messagingSenderId: "443227636027",
+    appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    signOut(auth).then(() => window.location.href = './index.html');
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = './index.html';
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, 'Users', user.uid));
+      if (!userDoc.exists()) throw new Error('Usuario no encontrado');
+
+      const userData = userDoc.data();
+      let clienteRef = userData.cliente_ref;
+
+      if (typeof clienteRef !== 'string') {
+        clienteRef = clienteRef?.path || '';
+      }
+
+      if (!clienteRef) throw new Error('cliente_ref no configurado');
+
+      const q = query(collection(db, 'Unidades'), where('tipo', '==', 'ctrl12'), where('cliente_ref', '==', clienteRef));
+      const unidadesSnap = await getDocs(q);
+
+      document.getElementById('cargando').style.display = 'none';
+
+      if (unidadesSnap.empty) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'No hay unidades CTRL12 asignadas';
+        return;
+      }
+
+      const grid = document.getElementById('grid');
+      grid.style.display = 'grid';
+
+      unidadesSnap.forEach(doc => {
+        const data = doc.data();
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'tarjeta';
+        tarjeta.innerHTML = `
+          <h2 class="tarjeta-titulo">${data.nombre || 'Sin nombre'}</h2>
+          <p class="tarjeta-meta">ID: ${data.device_id}</p>
+          <p class="tarjeta-meta">Tipo: ${data.tipo}</p>
+          <span class="tarjeta-estado ${data.conectado ? 'estado-online' : 'estado-offline'}">
+            ${data.conectado ? 'En línea' : 'Sin conexión'}
+          </span>
+        `;
+        tarjeta.addEventListener('click', () => window.location.href = `./equipo.html?id=${data.device_id}`);
+        grid.appendChild(tarjeta);
+      });
+
+    } catch (err) {
+      document.getElementById('cargando').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = `Error: ${err.message}`;
+    }
+  });
+</script>
+
 </body>
 </html>
