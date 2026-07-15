@@ -5,13 +5,14 @@
 <title>Diagnóstico CTRL12</title>
 <style>
   body { font-family: monospace; padding: 20px; background: #f5f5f5; }
-  pre { background: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #ddd; }
-  .error { color: red; }
-  .ok { color: green; }
+  pre { background: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #ddd; max-height: 400px; }
+  .error { color: red; font-weight: bold; }
+  .ok { color: green; font-weight: bold; }
+  h2 { margin-top: 20px; }
 </style>
 </head>
 <body>
-<h1>Diagnóstico Firebase</h1>
+<h1>Diagnóstico Firebase — CTRL12</h1>
 <div id="output"></div>
 
 <script type="module">
@@ -35,47 +36,69 @@
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      output.innerHTML = '<p class="error">No autenticado</p>';
+      output.innerHTML = '<p class="error">❌ No autenticado</p>';
       return;
     }
 
     try {
-      let html = `<p><strong>UID:</strong> ${user.uid}</p>`;
+      let html = `<h2>Usuario Logueado</h2>`;
+      html += `<p><strong>UID:</strong> ${user.uid}</p>`;
+      html += `<p><strong>Email:</strong> ${user.email}</p>`;
 
       // 1. Leer Users/{uid}
+      html += `<h2>1. Verificando Users/${user.uid}</h2>`;
       const userDoc = await getDoc(doc(db, 'Users', user.uid));
+      
+      let userData = null;
       if (!userDoc.exists()) {
-        html += '<p class="error">❌ Usuario NO existe en Users/{uid}</p>';
+        html += '<p class="error">❌ Documento NO existe en Users/{uid}</p>';
       } else {
-        const userData = userDoc.data();
-        html += `<p class="ok">✓ Usuario encontrado</p>`;
+        userData = userDoc.data();
+        html += `<p class="ok">✓ Documento encontrado</p>`;
+        html += `<h3>Contenido:</h3>`;
         html += `<pre>${JSON.stringify(userData, null, 2)}</pre>`;
-        html += `<p><strong>cliente_ref valor:</strong> "${userData.cliente_ref}"</p>`;
-        html += `<p><strong>cliente_ref tipo:</strong> ${typeof userData.cliente_ref}</p>`;
+        if (userData.cliente_ref) {
+          html += `<p><strong>cliente_ref valor:</strong> <code>"${userData.cliente_ref}"</code></p>`;
+          html += `<p><strong>cliente_ref tipo:</strong> <code>${typeof userData.cliente_ref}</code></p>`;
+        } else {
+          html += `<p class="error">❌ cliente_ref NO definido en Users/{uid}</p>`;
+        }
       }
 
       // 2. Leer Unidades/CE000001
+      html += `<h2>2. Verificando Unidades/CE000001</h2>`;
       const unitDoc = await getDoc(doc(db, 'Unidades', 'CE000001'));
+      
       if (!unitDoc.exists()) {
         html += '<p class="error">❌ CE000001 NO existe en Unidades</p>';
       } else {
         const unitData = unitDoc.data();
-        html += `<p class="ok">✓ Unidad CE000001 encontrada</p>`;
+        html += `<p class="ok">✓ Documento encontrado</p>`;
+        html += `<h3>Contenido:</h3>`;
         html += `<pre>${JSON.stringify(unitData, null, 2)}</pre>`;
-        html += `<p><strong>tipo:</strong> "${unitData.tipo}"</p>`;
-        html += `<p><strong>cliente_ref valor:</strong> "${unitData.cliente_ref}"</p>`;
-        html += `<p><strong>cliente_ref tipo:</strong> ${typeof unitData.cliente_ref}</p>`;
+        html += `<p><strong>tipo:</strong> <code>"${unitData.tipo}"</code></p>`;
+        if (unitData.cliente_ref) {
+          html += `<p><strong>cliente_ref valor:</strong> <code>"${unitData.cliente_ref}"</code></p>`;
+          html += `<p><strong>cliente_ref tipo:</strong> <code>${typeof unitData.cliente_ref}</code></p>`;
+        } else {
+          html += `<p class="error">❌ cliente_ref NO definido en Unidades/CE000001</p>`;
+        }
 
-        // Comparación
-        const userRef = userData.cliente_ref;
-        const unitRef = unitData.cliente_ref;
-        const coincide = userRef === unitRef;
-        html += `<p><strong>¿Coinciden?</strong> <span class="${coincide ? 'ok' : 'error'}">${coincide ? '✓ SÍ' : '❌ NO'}</span></p>`;
+        // 3. Comparación
+        if (userData && userData.cliente_ref && unitData.cliente_ref) {
+          html += `<h2>3. Comparación</h2>`;
+          const coincide = userData.cliente_ref === unitData.cliente_ref;
+          html += `<p><strong>¿cliente_ref coinciden?</strong> <span class="${coincide ? 'ok' : 'error'}">${coincide ? '✓ SÍ' : '❌ NO'}</span></p>`;
+          if (!coincide) {
+            html += `<p class="error">Users: <code>${userData.cliente_ref}</code></p>`;
+            html += `<p class="error">Unidades: <code>${unitData.cliente_ref}</code></p>`;
+          }
+        }
       }
 
       output.innerHTML = html;
     } catch (err) {
-      output.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+      output.innerHTML = `<p class="error">Error: ${err.message}</p><pre>${err.stack}</pre>`;
     }
   });
 </script>
