@@ -182,12 +182,14 @@
     // Buscar unidades tipo ctrl12 del cliente
     const snap = await getDocs(collection(db, 'Unidades'));
     const unidades = [];
+    
+    // cliente_ref puede ser string o reference — normalizar ambos
+    const clientePath = clienteRef?.path || clienteRef || '';
+
     snap.forEach(d => {
       const data = d.data();
-      // Comparar path de referencia
-      const refPath = data.cliente_ref?.path || data.cliente_ref || '';
-      const clientePath = clienteRef?.path || clienteRef || '';
-      if (data.tipo === 'ctrl12' && refPath === clientePath) {
+      const uPath = data.cliente_ref?.path || data.cliente_ref || '';
+      if (data.tipo === 'ctrl12' && uPath === clientePath) {
         unidades.push({ id: d.id, ...data });
       }
     });
