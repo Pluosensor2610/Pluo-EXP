@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pluo — Mis Unidades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #1976D2;
+    --azul-claro: #E8F4FB;
+    --azul-oscuro: #0D4E96;
+    --verde: #2FB65A;
+    --gris: #B9C2C6;
+    --alerta: #E24C4C;
+    --texto: #1A2B33;
+    --texto-tenue: #6B7C85;
+    --blanco: #FFFFFF;
+    --fondo: #F4F7F9;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--fondo);
+    font-family: 'Manrope', sans-serif;
+    color: var(--texto);
+  }
+
+  header {
+    background: var(--azul);
+    color: var(--blanco);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header img { width: 36px; height: 36px; }
+
+  header .titulos { flex: 1; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+  header p { font-size: 12px; margin: 0; opacity: 0.85; }
+
+  #btnSalir {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: var(--blanco);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .tarjeta-unidad {
+    background: var(--blanco);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+
+  .tarjeta-unidad:active { background: var(--azul-claro); }
+
+  .indicador {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gris);
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+  }
+
+  .indicador.activo { background: var(--verde); }
+  .indicador.alerta { background: var(--alerta); }
+
+  .info-unidad { flex: 1; min-width: 0; }
+  .info-unidad h3 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .info-unidad p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--texto-tenue);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .flecha { color: var(--texto-tenue); font-size: 18px; }
+
+  .mensaje-vacio, .mensaje-cargando {
+    text-align: center;
+    color: var(--texto-tenue);
+    padding: 60px 20px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="data:image/png;base64,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" alt="Pluo">
+  <div class="titulos">
+    <h1>Mis Unidades</h1>
+    <p id="correoUsuario">cargando…</p>
+  </div>
+  <button id="btnSalir">Salir</button>
+</header>
+
+<main>
+  <div id="listaUnidades">
+    <p class="mensaje-cargando">Cargando unidades…</p>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDfW9yzIoBAGxCvxZs6679Qn0_df_rkfZg",
+    authDomain: "pluo-pantalla.firebaseapp.com",
+    projectId: "pluo-pantalla",
+    storageBucket: "pluo-pantalla.firebasestorage.app",
+    messagingSenderId: "432080738709",
+    appId: "1:432080738709:web:6b83df90372f981fa27e9c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const listaUnidades = document.getElementById('listaUnidades');
+  const correoUsuario = document.getElementById('correoUsuario');
+  const btnSalir = document.getElementById('btnSalir');
+
+  btnSalir.addEventListener('click', async () => {
+    await signOut(auth);
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      // No hay sesión activa -> volver al login
+      window.location.href = 'index.html';
+      return;
+    }
+    correoUsuario.textContent = user.email;
+    await cargarUnidades(user.uid);
+  });
+
+  async function cargarUnidades(uid) {
+    const q = query(collection(db, 'unidades'), where('cliente_ref', '==', uid));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      listaUnidades.innerHTML = '<p class="mensaje-vacio">No tienes unidades asociadas todavía.</p>';
+      return;
+    }
+
+    listaUnidades.innerHTML = '';
+    const unidades = [];
+    snap.forEach((doc) => {
+      unidades.push({ id: doc.id, ...doc.data() });
+    });
+
+    unidades.forEach((u) => {
+      const div = document.createElement('div');
+      div.className = 'tarjeta-unidad';
+      div.id = `unidad-${u.device_id}`;
+      div.innerHTML = `
+        <div class="indicador" id="indicador-${u.device_id}"></div>
+        <div class="info-unidad">
+          <h3>${u.nombre || 'Sin nombre'}</h3>
+          <p id="estado-${u.device_id}">Consultando…</p>
+        </div>
+        <div class="flecha">›</div>
+      `;
+      // Etapa 3: navegar al detalle del equipo
+      div.addEventListener('click', () => {
+        window.location.href = `equipo.html?id=${u.device_id}`;
+      });
+      listaUnidades.appendChild(div);
+    });
+
+    conectarMQTT(unidades);
+  }
+
+  function conectarMQTT(unidades) {
+    // Requiere que mqtt.js esté cargado (ver script al final del body)
+    const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+      username: 'pluo_web_client',
+      password: 'Pluo2610',
+      clientId: 'web_lista_' + Math.random().toString(16).slice(2)
+    });
+
+    const timeouts = {};
+
+    client.on('connect', () => {
+      unidades.forEach((u) => {
+        client.subscribe(`pluo/${u.device_id}/resp`);
+        client.publish(`pluo/${u.device_id}/cmd`, `${u.token_observador}:GETESTADO`);
+
+        // Si no responde en 4s, se marca "Sin conexión"
+        timeouts[u.device_id] = setTimeout(() => {
+          actualizarTarjeta(u.device_id, 'sin_conexion');
+        }, 4000);
+      });
+    });
+
+    client.on('message', (topic, mensaje) => {
+      const deviceId = topic.split('/')[1];
+      const texto = mensaje.toString();
+
+      if (texto.startsWith('EST:')) {
+        clearTimeout(timeouts[deviceId]);
+        // EST:sector:programa:m3:estado:seg_transcurridos:h_config:m_config:pausa:modo:seg_dur_total:alerta
+        // NOTA: parseo por posición, según protocolo documentado.
+        // Si el firmware cambia el orden/cantidad de campos, este parser
+        // se rompe -- actualizar aquí y en mqtt.cpp en el mismo commit.
+        const partes = texto.split(':');
+        const estado = partes[4];   // 'estado' del riego (activo/inactivo)
+        const alerta = partes[11];  // campo alerta, si existe
+
+        if (alerta && alerta !== '0') {
+          actualizarTarjeta(deviceId, 'alerta');
+        } else if (estado === '1' || estado === 'ON') {
+          actualizarTarjeta(deviceId, 'activo');
+        } else {
+          actualizarTarjeta(deviceId, 'inactivo');
+        }
+      }
+    });
+
+    client.on('error', (err) => {
+      console.error('Error MQTT:', err);
+    });
+  }
+
+  function actualizarTarjeta(deviceId, estado) {
+    const indicador = document.getElementById(`indicador-${deviceId}`);
+    const textoEstado = document.getElementById(`estado-${deviceId}`);
+    if (!indicador || !textoEstado) return;
+
+    indicador.className = 'indicador';
+    switch (estado) {
+      case 'activo':
+        indicador.classList.add('activo');
+        textoEstado.textContent = 'Activo';
+        break;
+      case 'alerta':
+        indicador.classList.add('alerta');
+        textoEstado.textContent = 'Alerta';
+        break;
+      case 'sin_conexion':
+        textoEstado.textContent = 'Sin conexión';
+        break;
+      default:
+        textoEstado.textContent = 'No activo';
+    }
+  }
+</script>
+
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
+
+</body>
+</html>
