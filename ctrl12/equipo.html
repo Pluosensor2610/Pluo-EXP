@@ -283,9 +283,11 @@
     actualizarEstadoUI();
   }
 
-  function procesarHistorial(msg) {
+function procesarHistorial(msg) {
+    console.log('DEBUG: procesarHistorial llamado con:', msg);
     const p = msg.split(':');
     const n = parseInt(p[1]) || 0;
+    console.log('DEBUG: n =', n);
     let html = `<div style="font-size:12px;margin-bottom:10px"><strong>${n} registros</strong></div>`;
     for (let i = 0; i < n && i < 20; i++) {
       const idx = 2 + i * 8;
