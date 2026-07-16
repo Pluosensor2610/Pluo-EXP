@@ -72,7 +72,7 @@
   }
   .circulo-icono {
     width: 48px; height: 48px; border-radius: 50%;
-    background: var(--verde-ws); margin: 0 auto 8px auto;
+    background: var(--azul); margin: 0 auto 8px auto;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.2s ease;
   }
@@ -205,7 +205,7 @@
   .badge-placa2 { display: inline-block; font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; padding: 2px 6px; border-radius: 10px; background: rgba(230,81,0,0.12); color: var(--naranja); margin-left: 4px; }
   .badge-placa2.ok { background: rgba(37,211,102,0.12); color: var(--verde-ws); }
 
-  .pausa-alerta { display: inline-block; background: var(--alerta); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+  .pausa-alerta { display: inline-block; background: var(--alerta); color: #fff !important; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -469,7 +469,7 @@
     const rest = Math.max(0, e.durTotal - e.elapsed);
     const p2cls = e.placa2 === 'OK' ? 'ok' : '';
     const sectorNombre = e.sector > 0 ? (salidas[String(e.sector)]?.nombre || `Sector ${e.sector}`) : '—';
-    const pausaHTML = e.pausa ? `<div class="fila-estado"><span>Pausa</span><span class="pausa-alerta">PAUSADO</span></span></div>` : '';
+    const pausaHTML = e.pausa ? `<div class="fila-estado"><span>Pausa</span><span class="pausa-alerta" style="color: #fff !important;">PAUSADO</span></span></div>` : '';
 
     el.innerHTML = `
       <div class="fila-estado"><span>Estado</span><span>${estados[e.estado]||'?'}</span></div>
@@ -506,10 +506,10 @@
       if (badge) badge.style.display = placa2Down ? 'none' : 'block';
       
       if (s === e.sector && e.estado === 1) {
-        circulo.style.background = 'var(--azul)';
+        circulo.style.background = 'var(--verde-ws)';
         etxt.textContent = e.pausa ? 'Pausado' : 'Regando';
       } else {
-        circulo.style.background = 'var(--verde-ws)';
+        circulo.style.background = 'var(--azul)';
         etxt.textContent = 'No activo';
       }
     }
