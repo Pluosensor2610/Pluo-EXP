@@ -502,7 +502,7 @@ html<!DOCTYPE html>
       </div>
       <div class="btns-prog">
         <button class="btn-guardar" onclick="guardarProg()">Guardar</button>
-        <button class="btn-iniciar-prog" onclick="pub('INICIAR:${progActual}', tokenOp); mostrarToast('Iniciando programa ${progActual}…')">Iniciar ahora</button>
+        <button class="btn-iniciar-prog" onclick="pub('INICIAR:${progActual}', window.tokenOp); mostrarToast('Iniciando programa ${progActual}…')">Iniciar ahora</button>
       </div>
     `;
   }
