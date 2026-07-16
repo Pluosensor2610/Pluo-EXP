@@ -268,7 +268,6 @@
     if (!user) { window.location.href = './index.html'; return; }
     await cargarDatos();
     
-    // ASIGNAR A WINDOW DESPUÉS DE cargarDatos()
     window.tokenOp = tokenOp;
     window.tokenObs = tokenObs;
     window.pub = pub;
@@ -276,6 +275,9 @@
     
     renderUI();
     conectarMQTT();
+    
+    // SINCRONIZACIÓN AUTOMÁTICA DE HORA CADA 5 MINUTOS (v2.0)
+    iniciarSincronizacionHora();
   });
 
   /* ---------- FIRESTORE ---------- */
@@ -287,12 +289,10 @@
     tokenOp  = 'OP-CTRL-4m9q';
     document.getElementById('nombreEquipo').textContent = unidad.nombre || deviceId;
 
-    // Salidas
     salidas = {};
     const sSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Salidas'));
     sSnap.forEach(d => { salidas[d.id] = d.data(); });
 
-    // Programas
     programas = {};
     const pSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Programas'));
     pSnap.forEach(d => { programas[d.id] = d.data(); });
@@ -366,11 +366,37 @@
     actualizarEstadoUI();
   }
 
+  /* ---------- SINCRONIZACIÓN HORA (v2.0) ---------- */
+  function iniciarSincronizacionHora() {
+    // Sincronizar inmediatamente
+    sincronizarHora();
+    
+    // Luego cada 5 minutos (300000 ms)
+    setInterval(() => {
+      sincronizarHora();
+    }, 5 * 60 * 1000);
+    
+    #if DEBUG_CTRL12
+    console.log('[Equipo] Sincronización de hora iniciada (cada 5 min)');
+    #endif
+  }
+
+  function sincronizarHora() {
+    if (!window.pub) return;
+    
+    const ahora = new Date();
+    const hh = String(ahora.getHours()).padStart(2, '0');
+    const mm = String(ahora.getMinutes()).padStart(2, '0');
+    
+    pub(`SETHORA:${hh}:${mm}`, window.tokenOp);
+    
+    console.log(`[Equipo] Hora sincronizada: ${hh}:${mm}`);
+  }
+
   /* ---------- RENDER ---------- */
   function renderUI() {
     const main = document.getElementById('main');
     main.innerHTML = `
-      <!-- GRID 12 SECTORES -->
       <div class="grid-sectores" id="gridSectores">
         ${[...Array(NUM_SECTORES)].map((_,i) => {
           const s = i+1;
@@ -390,13 +416,11 @@
         }).join('')}
       </div>
 
-      <!-- TARJETA ESTADO -->
       <div class="tarjeta-card">
         <h2 id="estadoTitulo">Estado de Riego</h2>
         <div id="estadoLive"></div>
       </div>
 
-      <!-- BOTONES FIJOS -->
       <div class="botones-fijos">
         <button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button>
         <button class="btn-ctrl" onclick="accionSaltar()">Saltar</button>
@@ -404,7 +428,6 @@
         <button class="btn-ctrl" onclick="pedirHistorial()">Historial</button>
       </div>
 
-      <!-- RIEGO MANUAL -->
       <div class="seccion abierta">
         <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
           <h2>Riego Manual</h2>
@@ -426,7 +449,6 @@
         </div>
       </div>
 
-      <!-- PROGRAMAS -->
       <div class="seccion abierta">
         <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
           <h2>Programas</h2>
@@ -435,7 +457,6 @@
         <div class="cuerpo" id="seccionProgramas"></div>
       </div>
 
-      <!-- HISTORIAL -->
       <div class="seccion">
         <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
           <h2>Historial</h2>
@@ -458,7 +479,6 @@
     
     if (!el || !titulo) return;
 
-    // Aplicar parpadeo si hay pausa
     if (e.pausa) {
       titulo.classList.add('parpadeo');
     } else {
@@ -483,7 +503,6 @@
       ${e.estado===1?`<div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div>`:''}
     `;
 
-    // Actualizar grid sectores y ocultar placa 2 si está down
     const placa2Down = e.placa2 !== 'OK';
     for (let s = 1; s <= NUM_SECTORES; s++) {
       const circulo = document.getElementById(`circulo-${s}`);
@@ -493,7 +512,6 @@
       
       if (!circulo || !etxt) continue;
       
-      // Ocultar sectores 7-12 si placa 2 está down
       if (s > 6 && placa2Down) {
         circulo.parentElement.style.display = 'none';
         if (btnMan) btnMan.style.display = 'none';
@@ -502,7 +520,6 @@
         if (btnMan) btnMan.style.display = 'block';
       }
       
-      // Ocultar badge P2 si placa 2 está down
       if (badge) badge.style.display = placa2Down ? 'none' : 'block';
       
       if (s === e.sector && e.estado === 1) {
@@ -514,7 +531,6 @@
       }
     }
 
-    // Botón pausa
     const btnP = document.getElementById('btnPausa');
     if (btnP) {
       if (e.pausa) {
