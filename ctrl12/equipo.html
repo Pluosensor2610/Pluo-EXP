@@ -241,6 +241,13 @@
   onAuthStateChanged(auth, async user => {
     if (!user) { window.location.href = './index.html'; return; }
     await cargarDatos();
+    
+    // ASIGNAR A WINDOW DESPUÉS DE cargarDatos()
+    window.tokenOp = tokenOp;
+    window.tokenObs = tokenObs;
+    window.pub = pub;
+    window.mostrarToast = mostrarToast;
+    
     renderUI();
     conectarMQTT();
   });
@@ -451,11 +458,11 @@
     sectorManualSel = s;
     document.querySelectorAll('.btn-sector-manual').forEach((b,i) => b.classList.toggle('sel', i+1===s));
   };
-  window.accionManual  = function() { const m = document.getElementById('inputMin')?.value||5; pub(`MANUAL:${sectorManualSel},${m}`, tokenOp); mostrarToast(`Sector ${sectorManualSel} por ${m} min`); };
-  window.accionDetener = function() { pub('DETENER', tokenOp); mostrarToast('Deteniendo riego…'); };
-  window.accionSaltar  = function() { pub('SALTAR', tokenOp); mostrarToast('Saltando sector…'); };
-  window.accionPausa   = function() { pub(estadoActual.pausa?'REANUDAR':'PAUSAR', tokenOp); };
-  window.pedirHistorial = function() { pub('GETREGISTROS', tokenOp); mostrarToast('Cargando historial…'); };
+  window.accionManual  = function() { const m = document.getElementById('inputMin')?.value||5; pub(`MANUAL:${sectorManualSel},${m}`, window.tokenOp); mostrarToast(`Sector ${sectorManualSel} por ${m} min`); };
+  window.accionDetener = function() { pub('DETENER', window.tokenOp); mostrarToast('Deteniendo riego…'); };
+  window.accionSaltar  = function() { pub('SALTAR', window.tokenOp); mostrarToast('Saltando sector…'); };
+  window.accionPausa   = function() { pub(estadoActual.pausa?'REANUDAR':'PAUSAR', window.tokenOp); };
+  window.pedirHistorial = function() { pub('GETREGISTROS', window.tokenOp); mostrarToast('Cargando historial…'); };
 
   /* ---------- PROGRAMAS ---------- */
   function renderProgramas() {
@@ -530,11 +537,11 @@
     await setDoc(doc(db, 'Unidades', deviceId, 'Programas', String(progActual)), prog);
 
     const [hh, mm] = (prog.hora_inicio||'00:00').split(':');
-    pub(`SETPROG:${progActual},${prog.activo?1:0},0,${hh||0},${mm||0}`, tokenOp);
-    pub(`SETDIAS:${progActual},${prog.dias.map(d=>d?1:0).join(',')}`, tokenOp);
+    pub(`SETPROG:${progActual},${prog.activo?1:0},0,${hh||0},${mm||0}`, window.tokenOp);
+    pub(`SETDIAS:${progActual},${prog.dias.map(d=>d?1:0).join(',')}`, window.tokenOp);
     for (let s = 1; s <= NUM_SECTORES; s++) {
       const sc = prog.sectores[String(s)];
-      pub(`SETSECTOR:${progActual},${s},${sc.habilitado?1:0},${sc.horas},${sc.minutos}`, tokenOp);
+      pub(`SETSECTOR:${progActual},${s},${sc.habilitado?1:0},${sc.horas},${sc.minutos}`, window.tokenOp);
     }
 
     mostrarToast(`Programa ${progActual} guardado ✓`);
@@ -551,10 +558,6 @@
     t.textContent = msg; t.classList.add('visible');
     setTimeout(() => t.classList.remove('visible'), 2500);
   }
-
-  window.mostrarToast = mostrarToast;
-  window.tokenOp = tokenOp;
-  window.pub = pub;
 
 </script>
 
