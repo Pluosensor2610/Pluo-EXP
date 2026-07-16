@@ -264,7 +264,7 @@
     });
   }
 
-  function procesarEstado(msg) {
+  window.procesarEstado = function(msg) {
     const p = msg.split(':');
     estadoActual = {
       sector: parseInt(p[1])||0,
@@ -283,7 +283,7 @@
     actualizarEstadoUI();
   }
 
-function procesarHistorial(msg) {
+window.procesarHistorial = function(msg) {
     console.log('DEBUG: procesarHistorial llamado con:', msg);
     const p = msg.split(':');
     const n = parseInt(p[1]) || 0;
