@@ -253,7 +253,8 @@
     mqttClient.on('message', (topic, payload) => {
       const msg = payload.toString();
       if (msg.startsWith('EST:')) procesarEstado(msg);
-      if (msg.startsWith('REG:')) {
+      console.log('MQTT mensaje recibido:', msg);  // ← AGREGAR ESTA
+if (msg.startsWith('REG:')) {
   console.log('Procesando historial:', msg);
   procesarHistorial(msg);
 }
