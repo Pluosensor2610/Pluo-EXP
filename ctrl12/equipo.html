@@ -365,6 +365,8 @@
   window.accionPausa = function() { pub(estadoActual.pausa?'REANUDAR':'PAUSAR', window.tokenOp); };
   window.pedirHistorial = function() { pub('GETREGISTROS', window.tokenOp); mostrarToast('Cargando historial…'); };
 
+window.pedirHistorial = function() { pub('GETREGISTROS', window.tokenOp); mostrarToast('Cargando historial…');
+;};  
   function renderProgramas() {
     const prog = programas[String(progActual)] || {};
     const dias = prog.dias || [false,false,false,false,false,false,false];
