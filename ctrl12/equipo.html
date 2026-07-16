@@ -21,6 +21,11 @@
     --fondo:      #F4F7F9;
   }
 
+  @keyframes parpadeoRojo {
+    0%, 100% { background: var(--verde-ws); color: #fff; }
+    50% { background: var(--alerta); color: #fff; }
+  }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
   button { cursor: pointer; font-family: 'Manrope', sans-serif; }
@@ -67,7 +72,7 @@
   }
   .circulo-icono {
     width: 48px; height: 48px; border-radius: 50%;
-    background: var(--gris); margin: 0 auto 8px auto;
+    background: var(--verde-ws); margin: 0 auto 8px auto;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.2s ease;
   }
@@ -84,6 +89,10 @@
     font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em;
     color: #fff; margin: 0 0 12px 0;
     background: var(--verde-ws); padding: 8px 12px; border-radius: 8px;
+    transition: background 0.3s ease;
+  }
+  .tarjeta-card h2.parpadeo {
+    animation: parpadeoRojo 1s infinite;
   }
   .fila-estado { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #F0F0F0; }
   .fila-estado:last-child { border-bottom: none; }
@@ -383,7 +392,7 @@
 
       <!-- TARJETA ESTADO -->
       <div class="tarjeta-card">
-        <h2>Estado de Riego</h2>
+        <h2 id="estadoTitulo">Estado de Riego</h2>
         <div id="estadoLive"></div>
       </div>
 
@@ -445,7 +454,16 @@
     const e = estadoActual;
     const estados = ['Inactivo','Regando','Falla','Config'];
     const el = document.getElementById('estadoLive');
-    if (!el) return;
+    const titulo = document.getElementById('estadoTitulo');
+    
+    if (!el || !titulo) return;
+
+    // Aplicar parpadeo si hay pausa
+    if (e.pausa) {
+      titulo.classList.add('parpadeo');
+    } else {
+      titulo.classList.remove('parpadeo');
+    }
 
     const pct = e.durTotal > 0 ? Math.min(100, Math.round(e.elapsed/e.durTotal*100)) : 0;
     const rest = Math.max(0, e.durTotal - e.elapsed);
@@ -491,7 +509,7 @@
         circulo.style.background = 'var(--azul)';
         etxt.textContent = e.pausa ? 'Pausado' : 'Regando';
       } else {
-        circulo.style.background = 'var(--gris)';
+        circulo.style.background = 'var(--verde-ws)';
         etxt.textContent = 'No activo';
       }
     }
@@ -637,4 +655,4 @@
 <script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
 
 </body>
-</html
+</html>
