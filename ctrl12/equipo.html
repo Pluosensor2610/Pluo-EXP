@@ -11,7 +11,7 @@
     --azul:       #1976D2;
     --teal:       #00897B;
     --teal-light: #E0F2F1;
-    --verde:      #2FB65A;
+    --verde-ws:   #25D366;
     --gris:       #B9C2C6;
     --naranja:    #E65100;
     --alerta:     #E24C4C;
@@ -37,8 +37,13 @@
   header .titulos { flex: 1; min-width: 0; }
   header h1 { font-size: 16px; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   header p  { font-size: 11px; margin: 0; opacity: 0.85; font-family: 'IBM Plex Mono', monospace; }
-  .punto-conexion { width: 10px; height: 10px; border-radius: 50%; background: var(--gris); flex-shrink: 0; }
-  .punto-conexion.conectado { background: var(--verde); }
+  
+  .conexion-badge {
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    color: #fff; font-family: 'IBM Plex Mono', monospace;
+  }
+  .conexion-badge.online { background: var(--verde-ws); }
+  .conexion-badge.offline { background: var(--alerta); }
 
   main { max-width: 480px; margin: 0 auto; padding: 16px; }
 
@@ -75,22 +80,26 @@
     padding: 16px; margin-top: 16px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   }
-  .tarjeta-card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-tenue); margin: 0 0 12px 0; }
+  .tarjeta-card h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #fff; margin: 0 0 12px 0;
+    background: var(--verde-ws); padding: 8px 12px; border-radius: 8px;
+  }
   .fila-estado { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #F0F0F0; }
   .fila-estado:last-child { border-bottom: none; }
   .fila-estado span:first-child { color: var(--texto-tenue); }
   .fila-estado span:last-child  { color: var(--texto); font-weight: 600; }
   .barra-progreso { height: 6px; background: #E0E0E0; border-radius: 3px; margin-top: 10px; overflow: hidden; }
-  .barra-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 1s linear; }
+  .barra-fill { height: 100%; background: var(--azul); border-radius: 3px; transition: width 1s linear; }
 
-  /* BOTONES CONTROL */
-  .botones-control { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  /* BOTONES CONTROL FIJOS */
+  .botones-fijos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
   .btn-ctrl {
     padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700;
     border: 1px solid var(--gris); background: var(--blanco); color: var(--texto);
   }
-  .btn-ctrl.primario { background: var(--teal); color: #fff; border-color: var(--teal); }
-  .btn-ctrl.peligro  { color: var(--alerta); border-color: rgba(226,76,76,0.3); }
+  .btn-ctrl.primario { background: var(--azul); color: #fff; border-color: var(--azul); }
+  .btn-ctrl.peligro { background: var(--alerta); color: #fff; border-color: var(--alerta); }
   .btn-ctrl:disabled { opacity: 0.4; }
 
   /* RIEGO MANUAL */
@@ -99,8 +108,8 @@
     padding: 8px 4px; border-radius: 8px; font-size: 11px; font-weight: 700;
     border: 1px solid var(--gris); background: var(--blanco); color: var(--texto); text-align: center;
   }
-  .btn-sector-manual.p2 { border-style: dashed; }
-  .btn-sector-manual.sel { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .btn-sector-manual.p2 { border-style: dashed; display: none; }
+  .btn-sector-manual.sel { background: var(--azul); color: #fff; border-color: var(--azul); }
   .fila-manual { display: flex; align-items: center; gap: 8px; }
   .fila-manual label { font-size: 13px; font-weight: 600; color: var(--texto-tenue); white-space: nowrap; }
   .input-min {
@@ -108,7 +117,7 @@
     border: 1px solid var(--gris); border-radius: 8px;
     font-size: 15px; font-weight: 700; outline: none; background: var(--fondo);
   }
-  .input-min:focus { border-color: var(--teal); }
+  .input-min:focus { border-color: var(--azul); }
 
   /* SECCION DESPLEGABLE */
   .seccion {
@@ -131,35 +140,41 @@
     padding: 6px 12px; border: 1px solid var(--gris); border-radius: 20px;
     font-size: 12px; font-weight: 700; background: var(--blanco); color: var(--texto-tenue);
   }
-  .tab-prog.activo { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+  .tab-prog.activo { border-color: var(--azul); color: var(--azul); background: rgba(25,118,210,0.1); }
 
   .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
   .switch-label { font-size: 13px; font-weight: 600; }
   .switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
   .switch input { opacity: 0; width: 0; height: 0; }
   .switch-track { position: absolute; inset: 0; border-radius: 11px; background: #CCC; transition: background 0.2s; }
-  .switch input:checked + .switch-track { background: var(--teal); }
+  .switch input:checked + .switch-track { background: var(--azul); }
   .switch-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
   .switch input:checked ~ .switch-thumb { transform: translateX(18px); }
 
   .campo-hora { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
   .campo-hora label { font-size: 13px; font-weight: 600; }
   .campo-hora input { width: 90px; padding: 7px; text-align: center; border: 1px solid var(--gris); border-radius: 8px; font-size: 14px; font-weight: 700; outline: none; }
-  .campo-hora input:focus { border-color: var(--teal); }
+  .campo-hora input:focus { border-color: var(--azul); }
 
   .dias-wrap { display: flex; gap: 5px; padding: 8px 0; flex-wrap: wrap; border-bottom: 1px solid #F0F0F0; }
   .dia-chip { padding: 5px 9px; border: 1px solid var(--gris); border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--texto-tenue); cursor: pointer; user-select: none; }
-  .dia-chip.sel { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+  .dia-chip.sel { border-color: var(--azul); color: var(--azul); background: rgba(25,118,210,0.1); }
 
   .sector-row { display: grid; grid-template-columns: 28px 1fr 56px 56px; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
   .sector-row:last-child { border-bottom: none; }
   .sector-nombre { font-size: 12px; font-weight: 600; }
   .dur-inp { width: 100%; padding: 6px; text-align: center; border: 1px solid var(--gris); border-radius: 6px; font-size: 13px; font-weight: 700; outline: none; }
-  .dur-inp:focus { border-color: var(--teal); }
+  .dur-inp:focus { border-color: var(--azul); }
   .dur-inp:disabled { opacity: 0.35; background: #F5F5F5; }
 
+  .fert-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; align-items: center; }
+  .fert-label { font-size: 11px; font-weight: 600; color: var(--texto-tenue); }
+  .fert-inp { width: 100%; padding: 6px; text-align: center; border: 1px solid var(--gris); border-radius: 6px; font-size: 12px; font-weight: 700; outline: none; }
+  .fert-inp:focus { border-color: var(--azul); }
+  .fert-inp:disabled { opacity: 0.35; background: #F5F5F5; }
+
   .btns-prog { display: flex; gap: 8px; margin-top: 12px; }
-  .btn-guardar { flex: 1; padding: 11px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
+  .btn-guardar { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
   .btn-iniciar-prog { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
 
   /* HISTORIAL */
@@ -179,7 +194,9 @@
 
   .msg-cargando { text-align: center; color: var(--texto-tenue); padding: 40px 20px; font-size: 14px; }
   .badge-placa2 { display: inline-block; font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; padding: 2px 6px; border-radius: 10px; background: rgba(230,81,0,0.12); color: var(--naranja); margin-left: 4px; }
-  .badge-placa2.ok { background: rgba(47,182,90,0.12); color: var(--verde); }
+  .badge-placa2.ok { background: rgba(37,211,102,0.12); color: var(--verde-ws); }
+
+  .pausa-alerta { display: inline-block; background: var(--alerta); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -190,7 +207,7 @@
     <h1 id="nombreEquipo">Cargando…</h1>
     <p id="idEquipo">—</p>
   </div>
-  <div class="punto-conexion" id="puntoConexion"></div>
+  <span class="conexion-badge offline" id="conexionBadge">OFF LINE</span>
 </header>
 
 <main id="main">
@@ -272,7 +289,11 @@
     pSnap.forEach(d => { programas[d.id] = d.data(); });
     for (let p = 1; p <= 5; p++) {
       if (!programas[String(p)]) {
-        programas[String(p)] = { activo: false, hora_inicio: '00:00', dias: [false,false,false,false,false,false,false], sectores: {} };
+        programas[String(p)] = { 
+          activo: false, hora_inicio: '00:00', dias: [false,false,false,false,false,false,false], 
+          sectores: {},
+          fertilizacion: { agua_antes: 0, litros: 0, agua_despues: 0 }
+        };
       }
       for (let s = 1; s <= NUM_SECTORES; s++) {
         if (!programas[String(p)].sectores) programas[String(p)].sectores = {};
@@ -296,7 +317,9 @@
     });
 
     mqttClient.on('connect', () => {
-      document.getElementById('puntoConexion').classList.add('conectado');
+      document.getElementById('conexionBadge').classList.remove('offline');
+      document.getElementById('conexionBadge').classList.add('online');
+      document.getElementById('conexionBadge').textContent = 'ON LINE';
       mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
       pub('GETESTADO');
       setInterval(() => pub('GETESTADO'), 3000);
@@ -309,7 +332,9 @@
 
     mqttClient.on('error', err => {
       console.error('MQTT:', err);
-      document.getElementById('puntoConexion').classList.remove('conectado');
+      document.getElementById('conexionBadge').classList.remove('online');
+      document.getElementById('conexionBadge').classList.add('offline');
+      document.getElementById('conexionBadge').textContent = 'OFF LINE';
     });
   }
 
@@ -326,7 +351,8 @@
       pausa:    p[8]==='1',
       modo:     parseInt(p[9])||0,
       durTotal: parseInt(p[10])||0,
-      placa2:   p[11]||'TIMEOUT'
+      placa2:   p[11]||'TIMEOUT',
+      hora:     p[12]||'00:00'
     };
     actualizarEstadoUI();
   }
@@ -343,7 +369,7 @@
           const p2 = s > 6;
           return `
             <div class="tarjeta-sector" id="sect-${s}">
-              ${p2 ? '<span class="badge-p2">P2</span>' : ''}
+              ${p2 ? '<span class="badge-p2" id="badge-p2-${s}">P2</span>' : ''}
               <div class="nombre">${nombre}</div>
               <div class="circulo-icono" id="circulo-${s}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
@@ -355,10 +381,18 @@
         }).join('')}
       </div>
 
-      <!-- TARJETA ESTADO EN VIVO -->
+      <!-- TARJETA ESTADO -->
       <div class="tarjeta-card">
-        <h2>ESTADO EN VIVO</h2>
+        <h2>Estado de Riego</h2>
         <div id="estadoLive"></div>
+      </div>
+
+      <!-- BOTONES FIJOS -->
+      <div class="botones-fijos">
+        <button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button>
+        <button class="btn-ctrl" onclick="accionSaltar()">Saltar</button>
+        <button class="btn-ctrl primario" id="btnPausa" onclick="accionPausa()">Pausar</button>
+        <button class="btn-ctrl" onclick="pedirHistorial()">Historial</button>
       </div>
 
       <!-- RIEGO MANUAL -->
@@ -372,19 +406,13 @@
             ${[...Array(NUM_SECTORES)].map((_,i) => {
               const s = i+1;
               const p2 = s > 6 ? 'p2' : '';
-              return `<button class="btn-sector-manual ${p2}" onclick="selSector(${s})">Sector ${s}</button>`;
+              return `<button class="btn-sector-manual ${p2}" id="btn-manual-${s}" onclick="selSector(${s})">Sector ${s}</button>`;
             }).join('')}
           </div>
           <div class="fila-manual">
             <label>Minutos:</label>
             <input type="number" class="input-min" id="inputMin" value="5" min="1" max="600">
-            <button class="btn-ctrl primario" onclick="accionManual()">Riego</button>
-          </div>
-          <div class="botones-control">
-            <button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button>
-            <button class="btn-ctrl" onclick="accionSaltar()">Saltar</button>
-            <button class="btn-ctrl primario" id="btnPausa" onclick="accionPausa()">Pausar</button>
-            <button class="btn-ctrl" onclick="pedirHistorial()">Historial</button>
+            <button class="btn-ctrl primario" onclick="accionManual()">Activar</button>
           </div>
         </div>
       </div>
@@ -423,24 +451,44 @@
     const rest = Math.max(0, e.durTotal - e.elapsed);
     const p2cls = e.placa2 === 'OK' ? 'ok' : '';
     const sectorNombre = e.sector > 0 ? (salidas[String(e.sector)]?.nombre || `Sector ${e.sector}`) : '—';
+    const pausaHTML = e.pausa ? `<div class="fila-estado"><span>Pausa</span><span class="pausa-alerta">PAUSADO</span></span></div>` : '';
 
     el.innerHTML = `
-      <div class="fila-estado"><span>Estado</span><span>${e.pausa?'Pausado':estados[e.estado]||'?'}</span></div>
+      <div class="fila-estado"><span>Estado</span><span>${estados[e.estado]||'?'}</span></div>
       <div class="fila-estado"><span>Sector activo</span><span>${sectorNombre}</span></div>
       <div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>
       <div class="fila-estado"><span>Transcurrido</span><span>${fmtSeg(e.elapsed)}</span></div>
       <div class="fila-estado"><span>Restante</span><span>${fmtSeg(rest)}</span></div>
+      <div class="fila-estado"><span>Hora</span><span>${e.hora}</span></div>
       <div class="fila-estado"><span>Placa 2</span><span><span class="badge-placa2 ${p2cls}">${e.placa2}</span></span></div>
+      ${pausaHTML}
       ${e.estado===1?`<div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div>`:''}
     `;
 
-    // Actualizar grid sectores
+    // Actualizar grid sectores y ocultar placa 2 si está down
+    const placa2Down = e.placa2 !== 'OK';
     for (let s = 1; s <= NUM_SECTORES; s++) {
       const circulo = document.getElementById(`circulo-${s}`);
       const etxt    = document.getElementById(`etxt-${s}`);
+      const badge   = document.getElementById(`badge-p2-${s}`);
+      const btnMan  = document.getElementById(`btn-manual-${s}`);
+      
       if (!circulo || !etxt) continue;
+      
+      // Ocultar sectores 7-12 si placa 2 está down
+      if (s > 6 && placa2Down) {
+        circulo.parentElement.style.display = 'none';
+        if (btnMan) btnMan.style.display = 'none';
+      } else {
+        circulo.parentElement.style.display = 'block';
+        if (btnMan) btnMan.style.display = 'block';
+      }
+      
+      // Ocultar badge P2 si placa 2 está down
+      if (badge) badge.style.display = placa2Down ? 'none' : 'block';
+      
       if (s === e.sector && e.estado === 1) {
-        circulo.style.background = 'var(--teal)';
+        circulo.style.background = 'var(--azul)';
         etxt.textContent = e.pausa ? 'Pausado' : 'Regando';
       } else {
         circulo.style.background = 'var(--gris)';
@@ -450,7 +498,17 @@
 
     // Botón pausa
     const btnP = document.getElementById('btnPausa');
-    if (btnP) btnP.textContent = e.pausa ? 'Reanudar' : 'Pausar';
+    if (btnP) {
+      if (e.pausa) {
+        btnP.textContent = 'Reanudar';
+        btnP.classList.add('peligro');
+        btnP.classList.remove('primario');
+      } else {
+        btnP.textContent = 'Pausar';
+        btnP.classList.remove('peligro');
+        btnP.classList.add('primario');
+      }
+    }
   }
 
   /* ---------- ACCIONES ---------- */
@@ -469,6 +527,7 @@
     const prog = programas[String(progActual)] || {};
     const dias = prog.dias || [false,false,false,false,false,false,false];
     const sects = prog.sectores || {};
+    const fert = prog.fertilizacion || { agua_antes: 0, litros: 0, agua_despues: 0 };
     return `
       <div class="tabs-prog">
         ${[1,2,3,4,5].map(p=>`<button class="tab-prog ${p===progActual?'activo':''}" onclick="selProg(${p})">Prog ${p}</button>`).join('')}
@@ -485,6 +544,15 @@
         ${DIAS_NOMBRES.map((d,i)=>`<div class="dia-chip ${dias[i]?'sel':''}" onclick="this.classList.toggle('sel')">${d}</div>`).join('')}
       </div>
       <div style="margin-top:10px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--texto-tenue)">FERTILIZACIÓN</div>
+        <div class="fert-row">
+          <div><div class="fert-label">Agua Antes (L)</div><input type="number" class="fert-inp" id="fert-antes" value="${fert.agua_antes}" min="0" max="1000"></div>
+          <div><div class="fert-label">Litros Fert</div><input type="number" class="fert-inp" id="fert-litros" value="${fert.litros}" min="0" max="1000"></div>
+          <div><div class="fert-label">Agua Después (L)</div><input type="number" class="fert-inp" id="fert-despues" value="${fert.agua_despues}" min="0" max="1000"></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--texto-tenue)">SECTORES</div>
         ${[...Array(NUM_SECTORES)].map((_,i) => {
           const s = i+1;
           const sc = sects[String(s)] || { habilitado:false, horas:0, minutos:0 };
@@ -523,6 +591,11 @@
     const prog = programas[String(progActual)];
     prog.activo = document.getElementById('chkActivo')?.checked || false;
     prog.hora_inicio = document.getElementById('inputHora')?.value || '00:00';
+    prog.fertilizacion = {
+      agua_antes: parseInt(document.getElementById('fert-antes')?.value) || 0,
+      litros: parseInt(document.getElementById('fert-litros')?.value) || 0,
+      agua_despues: parseInt(document.getElementById('fert-despues')?.value) || 0
+    };
 
     const chips = document.querySelectorAll('.dia-chip');
     prog.dias = [...chips].map(c => c.classList.contains('sel'));
@@ -564,4 +637,4 @@
 <script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
 
 </body>
-</html>
+</html
