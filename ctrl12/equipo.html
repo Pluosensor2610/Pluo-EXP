@@ -330,7 +330,23 @@ window.procesarHistorial = function(msg) {
     selProg(1);
     actualizarEstadoUI();
   }
-
+function autoContraerSecciones() {
+  document.querySelectorAll('.seccion .cabecera').forEach(cabecera => {
+    let timeoutId = null;
+    
+    cabecera.addEventListener('click', function() {
+      const seccion = this.parentElement;
+      
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      if (seccion.classList.contains('abierta')) {
+        timeoutId = setTimeout(() => {
+          seccion.classList.remove('abierta');
+        }, 2 * 60 * 1000);
+      }
+    });
+  });
+}
   function actualizarEstadoUI() {
     const e = estadoActual;
     const estados = ['Inactivo','Regando','Falla','Config'];
