@@ -3,261 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ctrl12 — Mi Riego</title>
+<title>Ctrl12 — Mis Unidades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --azul: #1976D2; --azul-claro: #E8F4FB; --teal: #00897B;
-  --verde: #2FB65A; --gris: #B9C2C6; --alerta: #E24C4C;
-  --texto: #1A2B33; --texto-tenue: #6B7C85; --blanco: #FFFFFF; --fondo: #F4F7F9;
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
-header { background: var(--azul); color: var(--blanco); padding: 16px 18px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
-.logo-header { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
-header h1 { font-size: 16px; margin: 0; font-weight: 700; flex: 1; }
-#btnAtras { background: transparent; border: none; color: var(--blanco); font-size: 20px; cursor: pointer; }
-main { max-width: 600px; margin: 0 auto; padding: 16px; }
-.tarjeta { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.grid-sectores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-.tarjeta-sector { background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%); border-radius: 10px; padding: 12px; text-align: center; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.2s ease; }
-.tarjeta-sector.activo { background: linear-gradient(135deg, #00897B 0%, #00695c 100%); color: var(--blanco); border-color: #00897B; }
-.circulo-icono { width: 48px; height: 48px; border-radius: 50%; background: #e0e0e0; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
-.tarjeta-sector.activo .circulo-icono { background: rgba(255,255,255,0.3); }
-.nombre { font-size: 12px; font-weight: 600; }
-.estado-texto { font-size: 10px; opacity: 0.7; margin-top: 4px; }
-.tarjeta-card { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-h2 { margin: 0 0 12px 0; font-size: 15px; font-weight: 700; }
-.fila-estado { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-.fila-estado:last-child { border-bottom: none; }
-.etiqueta { color: var(--texto-tenue); font-weight: 500; }
-.valor { font-weight: 600; color: var(--texto); }
-.botones-fijos { display: flex; gap: 8px; margin-bottom: 16px; }
-.btn-ctrl { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Manrope', sans-serif; transition: all 0.2s ease; }
-.btn-ctrl.primario { background: var(--verde); color: var(--blanco); }
-.btn-ctrl.primario:active { opacity: 0.85; }
-.btn-ctrl.peligro { background: var(--alerta); color: var(--blanco); }
-.btn-ctrl.peligro:active { opacity: 0.85; }
-.btn-ctrl { background: var(--blanco); color: var(--texto); border: 1px solid var(--gris); }
-.btn-ctrl:active { background: var(--azul-claro); }
-.seccion { margin-bottom: 12px; }
-.cabecera { background: var(--azul); color: var(--blanco); padding: 14px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-.cabecera h2 { margin: 0; font-size: 14px; }
-.flecha { font-size: 18px; transition: transform 0.3s ease; }
-.seccion.abierta .flecha { transform: rotate(180deg); }
-.cuerpo { display: none; padding: 16px; background: var(--blanco); border-radius: 0 0 10px 10px; border-top: 1px solid #f0f0f0; }
-.seccion.abierta .cuerpo { display: block; }
-.manual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-.btn-sector-manual { padding: 10px; border: 1px solid var(--gris); background: var(--blanco); border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
-.btn-sector-manual.activo { background: var(--azul); color: var(--blanco); border-color: var(--azul); }
-.fila-manual { display: flex; gap: 8px; align-items: center; }
-.fila-manual label { font-size: 12px; font-weight: 600; }
-.input-min { flex: 1; padding: 8px; border: 1px solid var(--gris); border-radius: 6px; font-size: 12px; }
-.fila-historial { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
-.linea1 { font-weight: 600; color: var(--texto); }
-.linea2 { color: var(--texto-tenue); font-size: 11px; margin-top: 2px; }
-.badge-placa2 { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-.badge-placa2.ok { background: #c8e6c9; color: #2e7d32; }
-.badge-placa2.timeout { background: #ffcdd2; color: #c62828; }
-.barra-progreso { width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-.barra-fill { height: 100%; background: var(--verde); width: 0%; }
+  :root {
+    --azul: #1976D2; --azul-claro: #E8F4FB; --teal: #00897B;
+    --verde: #2FB65A; --gris: #B9C2C6; --alerta: #E24C4C;
+    --texto: #1A2B33; --texto-tenue: #6B7C85; --blanco: #FFFFFF; --fondo: #F4F7F9;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
+  header { background: var(--azul); color: var(--blanco); padding: 18px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+  .logo-header { width: 36px; height: 36px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  header .titulos { flex: 1; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+  header p { font-size: 12px; margin: 0; opacity: 0.85; }
+  #btnSalir { background: rgba(255,255,255,0.15); border: none; color: var(--blanco); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Manrope', sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
+  .tarjeta-unidad { background: var(--blanco); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .tarjeta-unidad:active { background: var(--azul-claro); }
+  .indicador { width: 14px; height: 14px; border-radius: 50%; background: var(--gris); flex-shrink: 0; transition: background 0.2s ease; }
+  .indicador.activo { background: var(--verde); }
+  .indicador.alerta { background: var(--alerta); }
+  .info-unidad { flex: 1; min-width: 0; }
+  .info-unidad h3 { margin: 0 0 2px 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info-unidad p { margin: 0; font-size: 13px; color: var(--texto-tenue); font-family: 'IBM Plex Mono', monospace; }
+  .flecha { color: var(--texto-tenue); font-size: 18px; }
+  .mensaje-vacio, .mensaje-cargando { text-align: center; color: var(--texto-tenue); padding: 60px 20px; font-size: 14px; }
 </style>
 </head>
 <body>
-
 <header>
-  <button id="btnAtras">←</button>
-  <h1 id="titulo">Mi Riego</h1>
+  <div class="logo-header">C12</div>
+  <div class="titulos">
+    <h1>Ctrl12</h1>
+    <p id="correoUsuario">…</p>
+  </div>
+  <button id="btnSalir">Salir</button>
 </header>
-
 <main>
-  <div id="main"></div>
+  <div id="listaUnidades">
+    <p class="mensaje-cargando">Cargando tus unidades…</p>
+  </div>
 </main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
-  authDomain: "pluo-compact-cef5og.firebaseapp.com",
-  projectId: "pluo-compact-cef5og",
-  storageBucket: "pluo-compact-cef5og.firebasestorage.app",
-  messagingSenderId: "443227636027",
-  appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const NUM_SECTORES = 12;
-const TOKEN_OBSERVADOR = 'OBS-CTRL-7f21';
-const TOKEN_OPERADOR = 'OP-CTRL-4m9q';
-
-let estadoActual = {};
-let sectorSeleccionado = 1;
-let programaSeleccionado = 1;
-let mqttClient = null;
-let deviceId = null;
-
-document.getElementById('btnAtras').addEventListener('click', () => window.location.href = 'index.html');
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = 'index.html'; return; }
-  const params = new URLSearchParams(window.location.search);
-  deviceId = params.get('id') || 'CE000001';
-  
-  const docSnap = await getDoc(doc(db, 'Unidades', deviceId));
-  if (docSnap.exists()) {
-    document.getElementById('titulo').textContent = docSnap.data().nombre || 'Mi Riego';
-  }
-  
-  renderUI();
-  conectarMQTT();
-});
-
-function renderUI() {
-  const main = document.getElementById('main');
-  main.innerHTML = `<div class="grid-sectores" id="gridSectores">${[...Array(NUM_SECTORES)].map((_,i)=>{const s=i+1;const p2=s>6?'p2':'';return`<div class="tarjeta-sector" id="sect-${s}"><div class="circulo-icono" id="circulo-${s}"></div><div class="nombre">Sector ${s}</div><div class="estado-texto" id="etxt-${s}">No activo</div></div>`;}).join('')}</div><div class="tarjeta-card"><h2>Estado de Riego</h2><div id="estadoLive"></div></div><div class="botones-fijos"><button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button><button class="btn-ctrl" onclick="accionSaltar()">Saltar</button><button class="btn-ctrl primario" id="btnPausa" onclick="accionPausa()">Pausar</button><button class="btn-ctrl" onclick="pedirHistorial()">Historial</button></div><div class="seccion abierta"><div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')"><h2>Riego Manual</h2><span class="flecha">▼</span></div><div class="cuerpo"><div class="manual-grid" id="gridManual">${[...Array(NUM_SECTORES)].map((_,i)=>{const s=i+1;const p2=s>6?'p2':'';return`<button class="btn-sector-manual ${p2}" id="btn-manual-${s}" onclick="selSector(${s})">S${s}</button>`;}).join('')}</div><div class="fila-manual"><label>Minutos:</label><input type="number" class="input-min" id="inputMin" value="5" min="1" max="600"><button class="btn-ctrl primario" onclick="accionManual()">Activar</button></div></div></div><div class="seccion abierta"><div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')"><h2>Historial</h2><span class="flecha">▼</span></div><div class="cuerpo" id="historialCuerpo"></div></div>`;
-  selSector(1);
-  actualizarEstadoUI();
-}
-
-window.selSector = function(n) {
-  sectorSeleccionado = n;
-  for (let i = 1; i <= NUM_SECTORES; i++) {
-    const btn = document.getElementById('btn-manual-' + i);
-    if (btn) btn.classList.toggle('activo', i === n);
-  }
-};
-
-window.accionManual = function() {
-  const min = parseInt(document.getElementById('inputMin').value) || 5;
-  pub(`MANUAL:${sectorSeleccionado},${min}`, TOKEN_OPERADOR);
-};
-
-window.accionDetener = function() { pub('DETENER', TOKEN_OPERADOR); };
-window.accionPausa = function() { pub(estadoActual.pausa ? 'REANUDAR' : 'PAUSAR', TOKEN_OPERADOR); };
-window.accionSaltar = function() { pub('SALTAR', TOKEN_OPERADOR); };
-window.pedirHistorial = function() { pub('GETREGISTROS', TOKEN_OBSERVADOR); };
-
-function pub(cmd, token) {
-  if (!mqttClient || !mqttClient.connected) return;
-  mqttClient.publish(`ctrl12/${deviceId}/cmd`, `${token}:${cmd}`);
-}
-
-window.procesarEstado = function(msg) {
-  const p = msg.split(':');
-  estadoActual = {
-    sector: parseInt(p[1])||0,
-    programa: parseInt(p[2])||0,
-    m3: parseFloat(p[3])||0,
-    estado: parseInt(p[4])||0,
-    elapsed: parseInt(p[5])||0,
-    hCfg: parseInt(p[6])||0,
-    mCfg: parseInt(p[7])||0,
-    pausa: p[8]==='1',
-    modo: parseInt(p[9])||0,
-    durTotal: parseInt(p[10])||0,
-    placa2: p[11]||'TIMEOUT',
-    hora: p[12]||'0000',
-    sector_traslape: parseInt(p[13])||0
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+    authDomain: "pluo-compact-cef5og.firebaseapp.com",
+    projectId: "pluo-compact-cef5og",
+    storageBucket: "pluo-compact-cef5og.firebasestorage.app",
+    messagingSenderId: "443227636027",
+    appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
   };
-  actualizarEstadoUI();
-};
 
-window.procesarHistorial = function(msg) {
-  const p = msg.split(':');
-  const n = parseInt(p[1]) || 0;
-  let html = `<div style="font-size:12px;margin-bottom:10px"><strong>${n} registros</strong></div>`;
-  for (let i = 0; i < n && i < 20; i++) {
-    const idx = 2 + i * 8;
-    const dia = p[idx] || '?';
-    const mes = p[idx+1] || '?';
-    const hora = p[idx+2] || '?';
-    const min = p[idx+3] || '?';
-    const sector = p[idx+4] || '?';
-    const programa = p[idx+5] || '?';
-    const duracion = p[idx+6] || '?';
-    const m3 = p[idx+7] || '0';
-    html += `<div class="fila-historial"><div class="linea1">Sector ${sector} - Prog ${programa}</div><div class="linea2">${dia}/${mes} ${hora}:${min} | ${duracion}s | ${m3}m³</div></div>`;
-  }
-  const el = document.getElementById('historialCuerpo');
-  if (el) el.innerHTML = html;
-};
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-function actualizarEstadoUI() {
-  const e = estadoActual;
-  
-  for (let s = 1; s <= NUM_SECTORES; s++) {
-    const circulo = document.getElementById('circulo-' + s);
-    const etxt = document.getElementById('etxt-' + s);
-    if (!circulo || !etxt) continue;
-    
-    if ((s === e.sector || s === e.sector_traslape) && e.estado === 1) {
-      circulo.style.background = 'var(--verde-ws)';
-      circulo.style.boxShadow = '0 0 12px rgba(47, 182, 90, 0.5)';
-    } else {
-      circulo.style.background = '#e0e0e0';
-      circulo.style.boxShadow = 'none';
+  const listaUnidades = document.getElementById('listaUnidades');
+  const correoUsuario = document.getElementById('correoUsuario');
+
+  document.getElementById('btnSalir').addEventListener('click', () => signOut(auth));
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'index.html'; return; }
+    correoUsuario.textContent = user.email;
+    await cargarUnidades(user);
+  });
+
+  async function cargarUnidades(user) {
+    const userSnap = await getDoc(doc(db, 'Users', user.uid));
+    if (!userSnap.exists()) {
+      listaUnidades.innerHTML = '<p class="mensaje-vacio">Sin acceso. Contacta a tu administrador.</p>';
+      return;
     }
-    
-    if (s === e.sector && e.estado === 1) {
-      etxt.textContent = 'Regando';
-    } else {
-      etxt.textContent = 'No activo';
+
+    const clienteRef = userSnap.data().cliente_ref;
+    const clientePath = (clienteRef?.path || clienteRef || '').replace(/^\//, '');
+    console.log('DEBUG cliente_ref normalizado:', clientePath);
+
+    const snap = await getDocs(collection(db, 'Unidades'));
+    const unidades = [];
+
+    snap.forEach(d => {
+      const data = d.data();
+      const uPath = (data.cliente_ref?.path || data.cliente_ref || '').replace(/^\//, '');
+      console.log('DEBUG unidad:', d.id, 'tipo:', data.tipo, 'ref normalizada:', uPath);
+      if (data.tipo === 'ctrl12' && uPath === clientePath) {
+        unidades.push({ id: d.id, ...data });
+      }
+    });
+
+    console.log('DEBUG unidades encontradas:', unidades.length);
+
+    if (unidades.length === 0) {
+      listaUnidades.innerHTML = '<p class="mensaje-vacio">No tienes unidades asociadas todavía.</p>';
+      return;
+    }
+
+    listaUnidades.innerHTML = '';
+    unidades.sort((a,b) => a.id.localeCompare(b.id));
+
+    unidades.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'tarjeta-unidad';
+      div.innerHTML = `
+        <div class="indicador" id="indicador-${u.id}"></div>
+        <div class="info-unidad">
+          <h3>${u.nombre || 'Sin nombre'}</h3>
+          <p id="estado-${u.id}">${u.id} · Consultando…</p>
+        </div>
+        <div class="flecha">›</div>
+      `;
+      div.addEventListener('click', () => {
+        window.location.href = `equipo.html?id=${u.id}`;
+      });
+      listaUnidades.appendChild(div);
+    });
+
+    conectarMQTT(unidades);
+  }
+
+  function conectarMQTT(unidades) {
+    const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+      username: 'pluo_firmware',
+      password: 'Pluo2012',
+      clientId: 'ctrl12_lista_' + Math.random().toString(16).slice(2)
+    });
+
+    const timeouts = {};
+
+    client.on('connect', () => {
+      unidades.forEach(u => {
+        client.subscribe('ctrl12/' + u.id + '/resp');
+        client.publish('ctrl12/' + u.id + '/cmd', (u.token_observador || 'OBS-CTRL-7f21') + ':GETESTADO');
+        timeouts[u.id] = setTimeout(() => actualizarTarjeta(u.id, 'sin_conexion'), 4000);
+      });
+    });
+
+    client.on('message', (topic, mensaje) => {
+      const deviceId = topic.split('/')[1];
+      const texto = mensaje.toString();
+      if (texto.startsWith('EST:')) {
+        clearTimeout(timeouts[deviceId]);
+        const partes = texto.split(':');
+        const estado = partes[4];
+        const placa2 = partes[11] || 'TIMEOUT';
+        if (placa2 === 'TIMEOUT') actualizarTarjeta(deviceId, 'alerta');
+        else if (estado === '1') actualizarTarjeta(deviceId, 'activo');
+        else actualizarTarjeta(deviceId, 'inactivo');
+      }
+    });
+
+    client.on('error', err => console.error('MQTT error:', err));
+  }
+
+  function actualizarTarjeta(deviceId, estado) {
+    const indicador = document.getElementById('indicador-' + deviceId);
+    const textoEl = document.getElementById('estado-' + deviceId);
+    if (!indicador || !textoEl) return;
+    indicador.className = 'indicador';
+    switch (estado) {
+      case 'activo':    indicador.classList.add('activo'); textoEl.textContent = deviceId + ' · Regando'; break;
+      case 'alerta':    indicador.classList.add('alerta'); textoEl.textContent = deviceId + ' · Placa 2 sin conexión'; break;
+      case 'sin_conexion': textoEl.textContent = deviceId + ' · Sin conexión'; break;
+      default:          textoEl.textContent = deviceId + ' · No activo';
     }
   }
-  
-  const estados = ['Inactivo', 'Regando', 'Pausa', 'Error'];
-  const estadoTxt = estados[e.estado] || '?';
-  const rest = Math.max(0, e.durTotal - e.elapsed);
-  const pct = e.durTotal > 0 ? Math.round((e.elapsed / e.durTotal) * 100) : 0;
-  const sectorNombre = e.sector > 0 ? `Sector ${e.sector}` : '-';
-  const p2cls = e.placa2 === 'OK' ? 'ok' : 'timeout';
-  
-  const hora = (() => {
-    const h = p[12] || '0000';
-    if (h.length === 4) return h.slice(0, 2) + ':' + h.slice(2);
-    return h || '00:00';
-  })();
-  
-  const html = `<div class="fila-estado"><span class="etiqueta">Estado</span><span class="valor">${estadoTxt}</span></div><div class="fila-estado"><span class="etiqueta">Sector activo</span><span class="valor">${sectorNombre}</span></div><div class="fila-estado"><span class="etiqueta">Programa</span><span class="valor">${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div><div class="fila-estado"><span class="etiqueta">Transcurrido</span><span class="valor">${Math.floor(e.elapsed/60)}m ${e.elapsed%60}s</span></div><div class="fila-estado"><span class="etiqueta">Restante</span><span class="valor">${Math.floor(rest/60)}m ${rest%60}s</span></div><div class="fila-estado"><span class="etiqueta">Hora</span><span class="valor">${e.hora}</span></div><div class="fila-estado"><span class="etiqueta">Placa 2</span><span class="valor"><span class="badge-placa2 ${p2cls}">${e.placa2}</span></span></div>${e.estado===1?`<div style="margin-top:10px"><div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--texto-tenue);margin-top:4px">${pct}% completado</div></div>`:''}`;
-  
-  const el = document.getElementById('estadoLive');
-  if (el) el.innerHTML = html;
-  
-  const btnPausa = document.getElementById('btnPausa');
-  if (btnPausa) btnPausa.textContent = e.pausa ? 'Reanudar' : 'Pausar';
-}
-
-function conectarMQTT() {
-  mqttClient = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
-    username: 'pluo_web_client',
-    password: 'Pluo2610',
-    clientId: 'web_equipo_' + Math.random().toString(16).slice(2)
-  });
-  
-  mqttClient.on('connect', () => {
-    mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
-    pub('GETESTADO', TOKEN_OBSERVADOR);
-  });
-  
-  mqttClient.on('message', (topic, payload) => {
-    const msg = payload.toString();
-    if (msg.startsWith('EST:')) procesarEstado(msg);
-    if (msg.startsWith('REG:')) procesarHistorial(msg);
-  });
-}
-
-setInterval(() => {
-  if (mqttClient && mqttClient.connected) {
-    pub('GETESTADO', TOKEN_OBSERVADOR);
-  }
-}, 3000);
 </script>
 
 <script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
