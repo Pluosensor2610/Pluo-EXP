@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ctrl12 — Mis Unidades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #1976D2; --teal: #00897B; --verde: #2FB65A;
+    --gris: #B9C2C6; --alerta: #E24C4C; --texto: #1A2B33;
+    --texto-tenue: #6B7C85; --blanco: #FFFFFF; --fondo: #F4F7F9;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
+  header { background: var(--azul); color: var(--blanco); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .logo { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+  header h1 { font-size: 16px; margin: 0; flex: 1; }
+  header p { font-size: 11px; margin: 0; opacity: 0.8; }
+  #btnSalir { background: rgba(255,255,255,0.2); border: none; color: var(--blanco); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Manrope', sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
+  .tarjeta { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: center; cursor: pointer; }
+  .punto { width: 12px; height: 12px; border-radius: 50%; background: var(--gris); }
+  .punto.activo { background: var(--verde); }
+  .punto.alerta { background: var(--alerta); }
+  .info { flex: 1; }
+  .info h3 { margin: 0; font-size: 14px; font-weight: 700; }
+  .info p { margin: 4px 0 0; font-size: 12px; color: var(--texto-tenue); }
+  .error { text-align: center; padding: 40px 20px; color: var(--alerta); }
+  .loading { text-align: center; padding: 40px 20px; color: var(--texto-tenue); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">C12</div>
+  <div style="flex:1;">
+    <h1>Ctrl12</h1>
+    <p id="email">…</p>
+  </div>
+  <button id="btnSalir">Salir</button>
+</header>
+
+<main id="main">
+  <div class="loading">Cargando…</div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+  authDomain: "pluo-compact-cef5og.firebaseapp.com",
+  projectId: "pluo-compact-cef5og",
+  storageBucket: "pluo-compact-cef5og.firebasestorage.app",
+  messagingSenderId: "443227636027",
+  appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const main = document.getElementById('main');
+const emailEl = document.getElementById('email');
+let unidadesActuales = [];
+
+document.getElementById('btnSalir').addEventListener('click', () => {
+  auth.signOut().then(() => window.location.href = 'index.html');
+});
+
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    main.innerHTML = '<p class="error">Redirigiendo al login…</p>';
+    setTimeout(() => window.location.href = '../', 2000);
+    return;
+  }
+  
+  emailEl.textContent = user.email;
+  cargarUnidades(user);
+});
+
+async function cargarUnidades(user) {
+  try {
+    const userDoc = await db.collection('Users').doc(user.uid).get();
+    if (!userDoc.exists) {
+      main.innerHTML = '<p class="error">Sin acceso configurado.</p>';
+      return;
+    }
+
+    const clientePath = (userDoc.data().cliente_ref || '').replace(/^\//, '');
+    const unidades = [];
+    const snap = await db.collection('Unidades').get();
+    
+    snap.forEach(doc => {
+      const data = doc.data();
+      const uPath = (data.cliente_ref || '').replace(/^\//, '');
+      if (data.tipo === 'ctrl12' && uPath === clientePath) {
+        unidades.push({ id: doc.id, ...data });
+      }
+    });
+
+    if (unidades.length === 0) {
+      main.innerHTML = '<p class="error">No tienes unidades.</p>';
+      return;
+    }
+
+    unidadesActuales = unidades;
+    renderUnidades();
+    conectarMQTT();
+  } catch (e) {
+    console.error('Error:', e);
+    main.innerHTML = '<p class="error">Error: ' + e.message + '</p>';
+  }
+}
+
+function renderUnidades() {
+  main.innerHTML = unidadesActuales.map(u => `
+    <div class="tarjeta" onclick="window.location.href='equipo.html?id=${u.id}'">
+      <div class="punto" id="punto-${u.id}"></div>
+      <div class="info">
+        <h3>${u.nombre || 'Sin nombre'}</h3>
+        <p id="estado-${u.id}">${u.id} · Consultando…</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function conectarMQTT() {
+  const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+    username: 'pluo_firmware',
+    password: 'Pluo2012',
+    clientId: 'web_' + Math.random().toString(16).slice(2)
+  });
+
+  client.on('connect', () => {
+    unidadesActuales.forEach(u => {
+      client.subscribe('pluo/' + u.id + '/resp');
+      client.publish('pluo/' + u.id + '/cmd', (u.token_observador || 'OBS-CTRL-7f21') + ':GETSALIDA:1');
+    });
+  });
+
+  client.on('message', (topic, msg) => {
+    const deviceId = topic.split('/')[1];
+    const texto = msg.toString();
+    const punto = document.getElementById('punto-' + deviceId);
+    const estadoEl = document.getElementById('estado-' + deviceId);
+    
+    if (!punto || !estadoEl) return;
+    
+    punto.className = 'punto';
+    if (texto.includes('TIMEOUT')) {
+      punto.classList.add('alerta');
+      estadoEl.textContent = 'Sin conexión';
+    } else if (texto.includes('ACTIVO')) {
+      punto.classList.add('activo');
+      estadoEl.textContent = 'Activo';
+    } else {
+      estadoEl.textContent = 'No activo';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
