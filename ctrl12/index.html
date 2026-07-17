@@ -18,7 +18,7 @@
   .logo { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
   header h1 { font-size: 16px; margin: 0; flex: 1; }
   header p { font-size: 11px; margin: 0; opacity: 0.8; }
-  #btnSalir { background: rgba(255,255,255,0.2); border: none; color: var(--blanco); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  #btnSalir { background: rgba(255,255,255,0.2); border: none; color: var(--blanco); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Manrope', sans-serif; }
   main { max-width: 480px; margin: 0 auto; padding: 16px; }
   .tarjeta { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: center; cursor: pointer; }
   .punto { width: 12px; height: 12px; border-radius: 50%; background: var(--gris); }
@@ -74,7 +74,7 @@ document.getElementById('btnSalir').addEventListener('click', () => {
 
 auth.onAuthStateChanged(user => {
   if (!user) {
-    main.innerHTML = '<p class="error">No autenticado. Redirigiendo…</p>';
+    main.innerHTML = '<p class="error">Redirigiendo al login…</p>';
     setTimeout(() => window.location.href = '../', 2000);
     return;
   }
@@ -92,8 +92,6 @@ async function cargarUnidades(user) {
     }
 
     const clientePath = (userDoc.data().cliente_ref || '').replace(/^\//, '');
-    console.log('Cliente path:', clientePath);
-
     const unidades = [];
     const snap = await db.collection('Unidades').get();
     
@@ -121,63 +119,49 @@ async function cargarUnidades(user) {
 
 function renderUnidades() {
   main.innerHTML = unidadesActuales.map(u => `
-    <div class="tarjeta" onclick="irA('equipo.html?id=${u.id}')">
+    <div class="tarjeta" onclick="window.location.href='equipo.html?id=${u.id}'">
       <div class="punto" id="punto-${u.id}"></div>
       <div class="info">
         <h3>${u.nombre || 'Sin nombre'}</h3>
-        <p id="estado-${u.id}">Consultando…</p>
+        <p id="estado-${u.id}">${u.id} · Consultando…</p>
       </div>
     </div>
   `).join('');
 }
 
 function conectarMQTT() {
-  try {
-    const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
-      username: 'pluo_firmware',
-      password: 'Pluo2012',
-      clientId: 'web_' + Math.random().toString(16).slice(2)
-    });
+  const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+    username: 'pluo_firmware',
+    password: 'Pluo2012',
+    clientId: 'web_' + Math.random().toString(16).slice(2)
+  });
 
-    client.on('connect', () => {
-      unidadesActuales.forEach(u => {
-        client.subscribe('ctrl12/' + u.id + '/resp');
-        client.publish('ctrl12/' + u.id + '/cmd', (u.token_observador || 'OBS-CTRL-7f21') + ':GETESTADO');
-      });
+  client.on('connect', () => {
+    unidadesActuales.forEach(u => {
+      client.subscribe('pluo/' + u.id + '/resp');
+      client.publish('pluo/' + u.id + '/cmd', (u.token_observador || 'OBS-CTRL-7f21') + ':GETSALIDA:1');
     });
+  });
 
-    client.on('message', (topic, msg) => {
-      const deviceId = topic.split('/')[1];
-      const texto = msg.toString();
-      if (texto.startsWith('EST:')) {
-        const p = texto.split(':');
-        const estado = p[4];
-        const placa2 = p[11];
-        
-        const punto = document.getElementById('punto-' + deviceId);
-        const estadoEl = document.getElementById('estado-' + deviceId);
-        
-        if (!punto || !estadoEl) return;
-        
-        punto.className = 'punto';
-        if (placa2 === 'TIMEOUT') {
-          punto.classList.add('alerta');
-          estadoEl.textContent = 'Placa 2 desconectada';
-        } else if (estado === '1') {
-          punto.classList.add('activo');
-          estadoEl.textContent = 'Regando';
-        } else {
-          estadoEl.textContent = 'No activo';
-        }
-      }
-    });
-  } catch (e) {
-    console.error('MQTT error:', e);
-  }
-}
-
-function irA(url) {
-  window.location.href = url;
+  client.on('message', (topic, msg) => {
+    const deviceId = topic.split('/')[1];
+    const texto = msg.toString();
+    const punto = document.getElementById('punto-' + deviceId);
+    const estadoEl = document.getElementById('estado-' + deviceId);
+    
+    if (!punto || !estadoEl) return;
+    
+    punto.className = 'punto';
+    if (texto.includes('TIMEOUT')) {
+      punto.classList.add('alerta');
+      estadoEl.textContent = 'Sin conexión';
+    } else if (texto.includes('ACTIVO')) {
+      punto.classList.add('activo');
+      estadoEl.textContent = 'Activo';
+    } else {
+      estadoEl.textContent = 'No activo';
+    }
+  });
 }
 </script>
 
