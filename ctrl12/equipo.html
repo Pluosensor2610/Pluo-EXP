@@ -85,16 +85,16 @@
     }
 
     const clienteRef = userSnap.data().cliente_ref;
-    const clientePath = clienteRef?.path || (typeof clienteRef === 'string' ? clienteRef : '') || '';
-    console.log('DEBUG cliente_ref:', clientePath);
+    const clientePath = (clienteRef?.path || clienteRef || '').replace(/^\//, '');
+    console.log('DEBUG cliente_ref normalizado:', clientePath);
 
     const snap = await getDocs(collection(db, 'Unidades'));
     const unidades = [];
 
     snap.forEach(d => {
       const data = d.data();
-      const uPath = data.cliente_ref?.path || (typeof data.cliente_ref === 'string' ? data.cliente_ref : '') || '';
-      console.log('DEBUG unidad:', d.id, 'tipo:', data.tipo, 'ref:', uPath);
+      const uPath = (data.cliente_ref?.path || data.cliente_ref || '').replace(/^\//, '');
+      console.log('DEBUG unidad:', d.id, 'tipo:', data.tipo, 'ref normalizada:', uPath);
       if (data.tipo === 'ctrl12' && uPath === clientePath) {
         unidades.push({ id: d.id, ...data });
       }
