@@ -3,82 +3,350 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ctrl12 — Mi Riego</title>
+<title>Pluo — Equipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --azul: #1976D2; --azul-claro: #E8F4FB; --teal: #00897B;
-  --verde: #2FB65A; --gris: #B9C2C6; --alerta: #E24C4C;
-  --texto: #1A2B33; --texto-tenue: #6B7C85; --blanco: #FFFFFF; --fondo: #F4F7F9;
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
-header { background: var(--azul); color: var(--blanco); padding: 16px 18px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
-.logo-header { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
-header h1 { font-size: 16px; margin: 0; font-weight: 700; flex: 1; }
-#btnAtras { background: transparent; border: none; color: var(--blanco); font-size: 20px; cursor: pointer; }
-main { max-width: 600px; margin: 0 auto; padding: 16px; }
-.tarjeta { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.grid-sectores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-.tarjeta-sector { background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%); border-radius: 10px; padding: 12px; text-align: center; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.2s ease; }
-.tarjeta-sector.activo { background: linear-gradient(135deg, #00897B 0%, #00695c 100%); color: var(--blanco); border-color: #00897B; }
-.circulo-icono { width: 48px; height: 48px; border-radius: 50%; background: #e0e0e0; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
-.tarjeta-sector.activo .circulo-icono { background: rgba(255,255,255,0.3); }
-.nombre { font-size: 12px; font-weight: 600; }
-.estado-texto { font-size: 10px; opacity: 0.7; margin-top: 4px; }
-.tarjeta-card { background: var(--blanco); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-h2 { margin: 0 0 12px 0; font-size: 15px; font-weight: 700; }
-.fila-estado { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-.fila-estado:last-child { border-bottom: none; }
-.etiqueta { color: var(--texto-tenue); font-weight: 500; }
-.valor { font-weight: 600; color: var(--texto); }
-.botones-fijos { display: flex; gap: 8px; margin-bottom: 16px; }
-.btn-ctrl { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Manrope', sans-serif; transition: all 0.2s ease; }
-.btn-ctrl.primario { background: var(--verde); color: var(--blanco); }
-.btn-ctrl.primario:active { opacity: 0.85; }
-.btn-ctrl.peligro { background: var(--alerta); color: var(--blanco); }
-.btn-ctrl.peligro:active { opacity: 0.85; }
-.btn-ctrl { background: var(--blanco); color: var(--texto); border: 1px solid var(--gris); }
-.btn-ctrl:active { background: var(--azul-claro); }
-.seccion { margin-bottom: 12px; }
-.cabecera { background: var(--azul); color: var(--blanco); padding: 14px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-.cabecera h2 { margin: 0; font-size: 14px; }
-.flecha { font-size: 18px; transition: transform 0.3s ease; }
-.seccion.abierta .flecha { transform: rotate(180deg); }
-.cuerpo { display: none; padding: 16px; background: var(--blanco); border-radius: 0 0 10px 10px; border-top: 1px solid #f0f0f0; }
-.seccion.abierta .cuerpo { display: block; }
-.manual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-.btn-sector-manual { padding: 10px; border: 1px solid var(--gris); background: var(--blanco); border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
-.btn-sector-manual.activo { background: var(--azul); color: var(--blanco); border-color: var(--azul); }
-.fila-manual { display: flex; gap: 8px; align-items: center; }
-.fila-manual label { font-size: 12px; font-weight: 600; }
-.input-min { flex: 1; padding: 8px; border: 1px solid var(--gris); border-radius: 6px; font-size: 12px; }
-.fila-historial { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
-.linea1 { font-weight: 600; color: var(--texto); }
-.linea2 { color: var(--texto-tenue); font-size: 11px; margin-top: 2px; }
-.badge-placa2 { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
-.badge-placa2.ok { background: #c8e6c9; color: #2e7d32; }
-.badge-placa2.timeout { background: #ffcdd2; color: #c62828; }
-.barra-progreso { width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-.barra-fill { height: 100%; background: var(--verde); width: 0%; }
+  :root {
+    --azul: #1976D2;
+    --texto: #1A2B33;
+    --texto-tenue: #6B7C85;
+    --blanco: #FFFFFF;
+    --fondo: #F4F7F9;
+    --gris: #B9C2C6;
+    --rojo: #E24C4C;
+    --verde-ws: #25D366;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--fondo);
+    font-family: 'Manrope', sans-serif;
+    color: var(--texto);
+  }
+
+  header {
+    background: var(--azul);
+    color: var(--blanco);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #btnVolver {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: var(--blanco);
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  header .titulos { flex: 1; min-width: 0; }
+  header h1 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  header p {
+    font-size: 11px;
+    margin: 0;
+    opacity: 0.85;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .punto-conexion {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gris);
+    flex-shrink: 0;
+  }
+  .punto-conexion.conectado { background: #2FB65A; }
+
+  main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .grid-sectores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .tarjeta-sector {
+    background: var(--blanco);
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  .tarjeta-sector .nombre {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .circulo-icono {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gris);
+    margin: 0 auto 8px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .circulo-icono svg { width: 37px; height: 37px; }
+
+  .tarjeta-sector .estado-texto {
+    font-size: 10px;
+    color: var(--texto-tenue);
+  }
+
+  .mensaje-cargando {
+    text-align: center;
+    color: var(--texto-tenue);
+    padding: 60px 20px;
+    font-size: 14px;
+    grid-column: 1 / -1;
+  }
+
+  /* --- Sección Programas (desplegable) --- */
+  .seccion-programas {
+    background: var(--blanco);
+    border-radius: 12px;
+    margin-top: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .seccion-programas .cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .seccion-programas .cabecera h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--texto-tenue);
+    margin: 0;
+  }
+  .seccion-programas .flecha {
+    transition: transform 0.2s ease;
+    color: var(--texto-tenue);
+    font-size: 14px;
+  }
+  .seccion-programas.abierta .flecha { transform: rotate(180deg); }
+  .seccion-programas .cuerpo {
+    display: none;
+    padding: 0 16px 16px 16px;
+  }
+  .seccion-programas.abierta .cuerpo { display: block; }
+
+  select.campo, input.campo {
+    background: var(--fondo);
+    border: 1px solid var(--gris);
+    border-radius: 6px;
+    color: var(--texto);
+    padding: 8px;
+    font-size: 12px;
+    font-family: 'Manrope', sans-serif;
+    width: 100%;
+  }
+  .fila-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .fila-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+
+  button.btn-accion {
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.btn-accion:active { opacity: 0.8; }
+  button.btn-secundario {
+    background: transparent;
+    color: var(--texto);
+    border: 1px solid var(--gris);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .tarjeta-sector-prog {
+    border: 1px solid var(--gris);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+
+  .toast-guardado {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--texto);
+    color: var(--blanco);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 100;
+  }
+  .toast-guardado.visible { opacity: 1; }
+
+  /* --- Tarjeta de Estado --- */
+  .tarjeta-estado {
+    background: var(--blanco);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .tarjeta-estado h2 {
+    font-size: 15px;
+    margin: 0 0 12px 0;
+    color: var(--texto);
+  }
+  .tarjeta-estado .fila-estado {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .tarjeta-estado .fila-estado span:first-child { color: var(--texto-tenue); }
+  .tarjeta-estado .fila-estado span:last-child { color: var(--texto); font-weight: 600; }
+  .tarjeta-estado .botones-control {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .btn-pausa {
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-pausa.en-pausa { background: #E24C4C; }
+  .btn-saltar {
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .fila-historial {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 12px;
+  }
+  .fila-historial .linea1 { color: var(--texto); font-weight: 600; }
+  .fila-historial .linea2 { color: var(--texto-tenue); font-size: 11px; margin-top: 2px; }
+
+  .tarjeta-estado .bannerEstado {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .bannerEstado.activo { background: var(--verde-ws); color: var(--blanco); }
+  .bannerEstado.pausado { background: var(--rojo); color: var(--blanco); animation: parpadeo 0.5s infinite; }
+  @keyframes parpadeo { 50% { opacity: 0.5; } }
 </style>
 </head>
 <body>
 
 <header>
-  <button id="btnAtras">←</button>
-  <h1 id="titulo">Mi Riego</h1>
+  <button id="btnVolver">←</button>
+  <div class="titulos">
+    <h1 id="titulo">Mi Riego</h1>
+    <p id="deviceInfo">…</p>
+  </div>
+  <div class="punto-conexion" id="puntoConexion"></div>
 </header>
 
 <main>
-  <div id="main"></div>
+  <div class="grid-sectores" id="gridSectores">
+    <p class="mensaje-cargando">Cargando sectores…</p>
+  </div>
+
+  <div class="tarjeta-estado">
+    <h2>Estado de Riego</h2>
+    <div id="bannerEstado"></div>
+    <div id="estadoLive"></div>
+    <div class="botones-control">
+      <button class="btn-pausa" id="btnPausa" onclick="cambiarPausa()">Pausar</button>
+      <button class="btn-saltar" onclick="saltarSector()">Saltar</button>
+    </div>
+  </div>
+
+  <div class="seccion-programas">
+    <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
+      <h2>Programas</h2>
+      <span class="flecha">▼</span>
+    </div>
+    <div class="cuerpo" id="contenidoProgramas"></div>
+  </div>
+
+  <div class="seccion-programas">
+    <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
+      <h2>Historial</h2>
+      <span class="flecha">▼</span>
+    </div>
+    <div class="cuerpo">
+      <button class="btn-accion" onclick="cargarHistorial()" style="width:100%">Cargar Historial</button>
+      <div id="listaHistorial" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="toast-guardado" id="toast"></div>
 </main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
@@ -93,171 +361,221 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const NUM_SECTORES = 12;
-const TOKEN_OBSERVADOR = 'OBS-CTRL-7f21';
-const TOKEN_OPERADOR = 'OP-CTRL-4m9q';
+const NUM_SALIDAS = 12;
+const NUM_PROGRAMAS = 5;
+const NOMBRES_PROGRAMA_WEB = { 0:'Riego', 1:'Prog 1', 2:'Prog 2', 3:'Prog 3', 4:'Prog 4', 5:'Prog 5' };
+const COLOR_POR_TIPO = { 'RIEGO': '#25D366', 'AUX': '#FFC107', 'FERTIL': '#FF9800' };
+const COLOR_FERTILIZANDO = '#FF6B6B';
 
-let estadoActual = {};
-let sectorSeleccionado = 1;
-let programaSeleccionado = 1;
-let mqttClient = null;
 let deviceId = null;
+let estadoActual = {};
+let salidasInfo = {};
+let registrosData = {};
+let registrosCountEsperado = null;
+let tokenOperador = null;
+let publicarComandoOperador = null;
+let puntoConexion = document.getElementById('puntoConexion');
 
-document.getElementById('btnAtras').addEventListener('click', () => window.location.href = 'index.html');
+document.getElementById('btnVolver').addEventListener('click', () => window.location.href = 'index.html');
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'index.html'; return; }
   const params = new URLSearchParams(window.location.search);
   deviceId = params.get('id') || 'CE000001';
+  document.getElementById('deviceInfo').textContent = deviceId;
   
-  const docSnap = await getDoc(doc(db, 'Unidades', deviceId));
-  if (docSnap.exists()) {
-    document.getElementById('titulo').textContent = docSnap.data().nombre || 'Mi Riego';
+  try {
+    const docSnap = await getDoc(doc(db, 'Unidades', deviceId));
+    if (docSnap.exists()) {
+      document.getElementById('titulo').textContent = docSnap.data().nombre || 'Mi Riego';
+      conectarMQTT(docSnap.data(), deviceId);
+    } else {
+      document.getElementById('gridSectores').innerHTML = '<p class="mensaje-cargando">Equipo no encontrado.</p>';
+    }
+  } catch (e) {
+    console.error('Error:', e);
   }
-  
-  renderUI();
-  conectarMQTT();
 });
 
 function renderUI() {
-  const main = document.getElementById('main');
-  main.innerHTML = `<div class="grid-sectores" id="gridSectores">${[...Array(NUM_SECTORES)].map((_,i)=>{const s=i+1;const p2=s>6?'p2':'';return`<div class="tarjeta-sector" id="sect-${s}"><div class="circulo-icono" id="circulo-${s}"></div><div class="nombre">Sector ${s}</div><div class="estado-texto" id="etxt-${s}">No activo</div></div>`;}).join('')}</div><div class="tarjeta-card"><h2>Estado de Riego</h2><div id="estadoLive"></div></div><div class="botones-fijos"><button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button><button class="btn-ctrl" onclick="accionSaltar()">Saltar</button><button class="btn-ctrl primario" id="btnPausa" onclick="accionPausa()">Pausar</button><button class="btn-ctrl" onclick="pedirHistorial()">Historial</button></div><div class="seccion abierta"><div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')"><h2>Riego Manual</h2><span class="flecha">▼</span></div><div class="cuerpo"><div class="manual-grid" id="gridManual">${[...Array(NUM_SECTORES)].map((_,i)=>{const s=i+1;const p2=s>6?'p2':'';return`<button class="btn-sector-manual ${p2}" id="btn-manual-${s}" onclick="selSector(${s})">S${s}</button>`;}).join('')}</div><div class="fila-manual"><label>Minutos:</label><input type="number" class="input-min" id="inputMin" value="5" min="1" max="600"><button class="btn-ctrl primario" onclick="accionManual()">Activar</button></div></div></div><div class="seccion abierta"><div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')"><h2>Historial</h2><span class="flecha">▼</span></div><div class="cuerpo" id="historialCuerpo"></div></div>`;
-  selSector(1);
-  actualizarEstadoUI();
-}
-
-window.selSector = function(n) {
-  sectorSeleccionado = n;
-  for (let i = 1; i <= NUM_SECTORES; i++) {
-    const btn = document.getElementById('btn-manual-' + i);
-    if (btn) btn.classList.toggle('activo', i === n);
+  let html = '';
+  for (let i = 1; i <= NUM_SALIDAS; i++) {
+    const p2 = i > 6 ? 'p2' : '';
+    html += `<div class="tarjeta-sector" id="salida-${i}">
+      <div class="nombre" id="nombre-${i}">Sector ${i}</div>
+      <div class="circulo-icono" id="icono-${i}" style="background:#ccc;"></div>
+      <div class="estado-texto" id="estado-${i}">No activo</div>
+    </div>`;
   }
-};
-
-window.accionManual = function() {
-  const min = parseInt(document.getElementById('inputMin').value) || 5;
-  pub(`MANUAL:${sectorSeleccionado},${min}`, TOKEN_OPERADOR);
-};
-
-window.accionDetener = function() { pub('DETENER', TOKEN_OPERADOR); };
-window.accionPausa = function() { pub(estadoActual.pausa ? 'REANUDAR' : 'PAUSAR', TOKEN_OPERADOR); };
-window.accionSaltar = function() { pub('SALTAR', TOKEN_OPERADOR); };
-window.pedirHistorial = function() { pub('GETREGISTROS', TOKEN_OBSERVADOR); };
-
-function pub(cmd, token) {
-  if (!mqttClient || !mqttClient.connected) return;
-  mqttClient.publish(`ctrl12/${deviceId}/cmd`, `${token}:${cmd}`);
+  document.getElementById('gridSectores').innerHTML = html;
 }
 
-window.procesarEstado = function(msg) {
+function mostrarToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+function cargarHistorial() {
+  if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
+  registrosData = {};
+  registrosCountEsperado = null;
+  document.getElementById('listaHistorial').innerHTML = '<p class="mensaje-cargando">Cargando…</p>';
+  publicarComandoOperador('GETREGISTROSCOUNT');
+}
+
+function procesarRespuestaHistorial(msg) {
+  if (msg.startsWith('REGCOUNT:')) {
+    const count = parseInt(msg.split(':')[1], 10);
+    registrosCountEsperado = count;
+    if (count === 0) {
+      document.getElementById('listaHistorial').innerHTML = '<p class="mensaje-cargando">Sin riegos registrados.</p>';
+      return;
+    }
+    for (let i = 0; i < count; i++) publicarComandoOperador(`GETREGISTROS:${i}`);
+    return;
+  }
+  if (msg.startsWith('REG:')) {
+    const p = msg.split(':');
+    const idx = parseInt(p[1], 10);
+    registrosData[idx] = {
+      dia: p[2], mes: p[3], hora: p[4], minuto: p[5],
+      sector: parseInt(p[6], 10),
+      programa: parseInt(p[7], 10),
+      duracionSeg: parseInt(p[8], 10),
+      m3: parseFloat(p[9])
+    };
+    renderHistorial();
+  }
+}
+
+function renderHistorial() {
+  if (registrosCountEsperado === null) return;
+  const idxs = Object.keys(registrosData).map(Number);
+  if (idxs.length < registrosCountEsperado) return;
+  idxs.sort((a, b) => b - a);
+  const html = idxs.map(i => {
+    const r = registrosData[i];
+    const dur = `${Math.floor(r.duracionSeg / 60)}m ${r.duracionSeg % 60}s`;
+    return `<div class="fila-historial">
+      <div class="linea1">Programa ${r.programa > 0 ? r.programa : '0'} — Sector ${r.sector}</div>
+      <div class="linea2">${r.dia}/${r.mes} ${r.hora}:${r.minuto} | ${dur} | ${r.m3.toFixed(2)} m³</div>
+    </div>`;
+  }).join('');
+  document.getElementById('listaHistorial').innerHTML = html;
+}
+
+function procesarRespuestaEstado(msg) {
   const p = msg.split(':');
   estadoActual = {
-    sector: parseInt(p[1])||0,
-    programa: parseInt(p[2])||0,
-    m3: parseFloat(p[3])||0,
-    estado: parseInt(p[4])||0,
-    elapsed: parseInt(p[5])||0,
-    hCfg: parseInt(p[6])||0,
-    mCfg: parseInt(p[7])||0,
-    pausa: p[8]==='1',
-    modo: parseInt(p[9])||0,
-    durTotal: parseInt(p[10])||0,
-    placa2: p[11]||'TIMEOUT',
-    hora: p[12]||'0000',
-    sector_traslape: parseInt(p[13])||0
+    sector: parseInt(p[1]) || 0,
+    programa: parseInt(p[2]) || 0,
+    m3: parseFloat(p[3]) || 0,
+    estado: parseInt(p[4]) || 0,
+    elapsed: parseInt(p[5]) || 0,
+    pausa: p[8] === '1',
+    durTotal: parseInt(p[10]) || 0,
+    placa2: p[11] || 'TIMEOUT',
+    hora: p[12] || '0000',
+    sector_traslape: parseInt(p[13]) || 0
   };
-  actualizarEstadoUI();
-};
+  renderEstadoUI();
+}
 
-window.procesarHistorial = function(msg) {
-  const p = msg.split(':');
-  const n = parseInt(p[1]) || 0;
-  let html = `<div style="font-size:12px;margin-bottom:10px"><strong>${n} registros</strong></div>`;
-  for (let i = 0; i < n && i < 20; i++) {
-    const idx = 2 + i * 8;
-    const dia = p[idx] || '?';
-    const mes = p[idx+1] || '?';
-    const hora = p[idx+2] || '?';
-    const min = p[idx+3] || '?';
-    const sector = p[idx+4] || '?';
-    const programa = p[idx+5] || '?';
-    const duracion = p[idx+6] || '?';
-    const m3 = p[idx+7] || '0';
-    html += `<div class="fila-historial"><div class="linea1">Sector ${sector} - Prog ${programa}</div><div class="linea2">${dia}/${mes} ${hora}:${min} | ${duracion}s | ${m3}m³</div></div>`;
-  }
-  const el = document.getElementById('historialCuerpo');
-  if (el) el.innerHTML = html;
-};
-
-function actualizarEstadoUI() {
+function renderEstadoUI() {
   const e = estadoActual;
+  const estado = ['Inactivo', 'Regando', 'Pausa', 'Error'][e.estado] || '?';
   
-  for (let s = 1; s <= NUM_SECTORES; s++) {
-    const circulo = document.getElementById('circulo-' + s);
-    const etxt = document.getElementById('etxt-' + s);
-    if (!circulo || !etxt) continue;
+  for (let i = 1; i <= NUM_SALIDAS; i++) {
+    const icono = document.getElementById(`icono-${i}`);
+    const etxt = document.getElementById(`estado-${i}`);
+    if (!icono || !etxt) continue;
     
-    if ((s === e.sector || s === e.sector_traslape) && e.estado === 1) {
-      circulo.style.background = 'var(--verde-ws)';
-      circulo.style.boxShadow = '0 0 12px rgba(47, 182, 90, 0.5)';
-    } else {
-      circulo.style.background = '#e0e0e0';
-      circulo.style.boxShadow = 'none';
-    }
-    
-    if (s === e.sector && e.estado === 1) {
+    if ((i === e.sector || i === e.sector_traslape) && e.estado === 1) {
+      icono.style.background = 'var(--verde-ws)';
+      icono.style.boxShadow = '0 0 12px rgba(37, 211, 102, 0.5)';
       etxt.textContent = 'Regando';
     } else {
+      icono.style.background = '#B9C2C6';
+      icono.style.boxShadow = 'none';
       etxt.textContent = 'No activo';
     }
   }
   
-  const estados = ['Inactivo', 'Regando', 'Pausa', 'Error'];
-  const estadoTxt = estados[e.estado] || '?';
+  const bannerHtml = e.estado === 1 ? (e.pausa ? '<div class="bannerEstado pausado">PAUSADO</div>' : '<div class="bannerEstado activo">REGANDO</div>') : '';
+  
   const rest = Math.max(0, e.durTotal - e.elapsed);
   const pct = e.durTotal > 0 ? Math.round((e.elapsed / e.durTotal) * 100) : 0;
-  const sectorNombre = e.sector > 0 ? `Sector ${e.sector}` : '-';
-  const p2cls = e.placa2 === 'OK' ? 'ok' : 'timeout';
+  const hora = e.hora.length === 4 ? e.hora.slice(0, 2) + ':' + e.hora.slice(2) : e.hora;
   
-  const hora = (() => {
-    const h = p[12] || '0000';
-    if (h.length === 4) return h.slice(0, 2) + ':' + h.slice(2);
-    return h || '00:00';
-  })();
+  const estadoHtml = `
+    ${bannerHtml}
+    <div class="fila-estado"><span>Estado</span><span>${estado}</span></div>
+    <div class="fila-estado"><span>Sector</span><span>S${e.sector || '-'}</span></div>
+    <div class="fila-estado"><span>Programa</span><span>${NOMBRES_PROGRAMA_WEB[e.programa] || 'Manual'}</span></div>
+    <div class="fila-estado"><span>Transcurrido</span><span>${Math.floor(e.elapsed/60)}m ${e.elapsed%60}s</span></div>
+    <div class="fila-estado"><span>Restante</span><span>${Math.floor(rest/60)}m ${rest%60}s</span></div>
+    <div class="fila-estado"><span>Hora</span><span>${hora}</span></div>
+    <div class="fila-estado"><span>Placa 2</span><span>${e.placa2}</span></div>
+    ${e.estado === 1 ? `<div style="margin-top:10px;"><div style="height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;"><div style="height:100%;background:var(--verde-ws);width:${pct}%;"></div></div><div style="font-size:10px;color:var(--texto-tenue);margin-top:4px;">${pct}% completado</div></div>` : ''}
+  `;
   
-  const html = `<div class="fila-estado"><span class="etiqueta">Estado</span><span class="valor">${estadoTxt}</span></div><div class="fila-estado"><span class="etiqueta">Sector activo</span><span class="valor">${sectorNombre}</span></div><div class="fila-estado"><span class="etiqueta">Programa</span><span class="valor">${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div><div class="fila-estado"><span class="etiqueta">Transcurrido</span><span class="valor">${Math.floor(e.elapsed/60)}m ${e.elapsed%60}s</span></div><div class="fila-estado"><span class="etiqueta">Restante</span><span class="valor">${Math.floor(rest/60)}m ${rest%60}s</span></div><div class="fila-estado"><span class="etiqueta">Hora</span><span class="valor">${e.hora}</span></div><div class="fila-estado"><span class="etiqueta">Placa 2</span><span class="valor"><span class="badge-placa2 ${p2cls}">${e.placa2}</span></span></div>${e.estado===1?`<div style="margin-top:10px"><div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--texto-tenue);margin-top:4px">${pct}% completado</div></div>`:''}`;
-  
-  const el = document.getElementById('estadoLive');
-  if (el) el.innerHTML = html;
-  
-  const btnPausa = document.getElementById('btnPausa');
-  if (btnPausa) btnPausa.textContent = e.pausa ? 'Reanudar' : 'Pausar';
+  document.getElementById('estadoLive').innerHTML = estadoHtml;
+  document.getElementById('btnPausa').textContent = e.pausa ? 'Reanudar' : 'Pausar';
 }
 
-function conectarMQTT() {
-  mqttClient = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+window.cambiarPausa = function() {
+  if (!publicarComandoOperador) return;
+  publicarComandoOperador(estadoActual.pausa ? 'REANUDAR' : 'PAUSAR');
+};
+
+window.saltarSector = function() {
+  if (!publicarComandoOperador) return;
+  publicarComandoOperador('SALTAR');
+};
+
+function conectarMQTT(unidad, deviceId) {
+  const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
     username: 'pluo_web_client',
     password: 'Pluo2610',
     clientId: 'web_equipo_' + Math.random().toString(16).slice(2)
   });
-  
-  mqttClient.on('connect', () => {
-    mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
-    pub('GETESTADO', TOKEN_OBSERVADOR);
+
+  tokenOperador = unidad.token_operador || null;
+  publicarComandoOperador = (cmd) => {
+    if (!tokenOperador) { mostrarToast('Sin token operador.'); return; }
+    client.publish(`pluo/${deviceId}/cmd`, `${tokenOperador}:${cmd}`);
+  };
+
+  client.on('connect', () => {
+    puntoConexion.classList.add('conectado');
+    client.subscribe(`pluo/${deviceId}/resp`);
+    renderUI();
+    const pedirEstados = () => {
+      client.publish(`pluo/${deviceId}/cmd`, `${unidad.token_observador}:GETESTADO`);
+    };
+    pedirEstados();
+    setInterval(pedirEstados, 3000);
   });
-  
-  mqttClient.on('message', (topic, payload) => {
-    const msg = payload.toString();
-    if (msg.startsWith('EST:')) procesarEstado(msg);
-    if (msg.startsWith('REG:')) procesarHistorial(msg);
+
+  client.on('message', (topic, msg) => {
+    const texto = msg.toString();
+    if (texto.startsWith('EST:')) procesarRespuestaEstado(texto);
+    if (texto.startsWith('REGCOUNT:') || texto.startsWith('REG:')) procesarRespuestaHistorial(texto);
   });
+
+  client.on('error', () => puntoConexion.classList.remove('conectado'));
 }
 
-setInterval(() => {
-  if (mqttClient && mqttClient.connected) {
-    pub('GETESTADO', TOKEN_OBSERVADOR);
-  }
-}, 3000);
+window.sincronizarHora = function() {
+  if (!publicarComandoOperador) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  publicarComandoOperador(`SETHORA:${hh}:${mm}`);
+  mostrarToast('Sincronizando hora...');
+};
 </script>
 
 <script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
