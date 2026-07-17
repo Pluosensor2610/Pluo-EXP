@@ -3,1246 +3,653 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pluo — Equipo</title>
+<title>Ctrl12 — Equipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --azul: #1976D2;
-    --texto: #1A2B33;
-    --texto-tenue: #6B7C85;
-    --blanco: #FFFFFF;
-    --fondo: #F4F7F9;
-    --gris: #B9C2C6;
-    --rojo: #E24C4C;
+    --azul:       #1976D2;
+    --teal:       #00897B;
+    --teal-light: #E0F2F1;
+    --verde-ws:   #25D366;
+    --gris:       #B9C2C6;
+    --naranja:    #E65100;
+    --alerta:     #E24C4C;
+    --texto:      #1A2B33;
+    --texto-tenue:#6B7C85;
+    --blanco:     #FFFFFF;
+    --fondo:      #F4F7F9;
+  }
+
+  @keyframes parpadeoRojo {
+    0%, 100% { background: var(--verde-ws); color: #fff; }
+    50% { background: var(--alerta); color: #fff; }
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--fondo);
-    font-family: 'Manrope', sans-serif;
-    color: var(--texto);
-  }
+  body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
+  button { cursor: pointer; font-family: 'Manrope', sans-serif; }
 
   header {
-    background: var(--azul);
-    color: var(--blanco);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    background: var(--azul); color: var(--blanco);
+    padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
   }
-
   #btnVolver {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: var(--blanco);
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    font-size: 18px;
-    cursor: pointer;
-    flex-shrink: 0;
+    background: rgba(255,255,255,0.15); border: none; color: var(--blanco);
+    width: 34px; height: 34px; border-radius: 8px; font-size: 18px; flex-shrink: 0;
   }
-
   header .titulos { flex: 1; min-width: 0; }
-  header h1 {
-    font-size: 16px;
-    margin: 0;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  header h1 { font-size: 16px; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header p  { font-size: 11px; margin: 0; opacity: 0.85; font-family: 'IBM Plex Mono', monospace; }
+  
+  .conexion-badge {
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    color: #fff; font-family: 'IBM Plex Mono', monospace;
   }
-  header p {
-    font-size: 11px;
-    margin: 0;
-    opacity: 0.85;
-    font-family: 'IBM Plex Mono', monospace;
-  }
+  .conexion-badge.online { background: var(--verde-ws); }
+  .conexion-badge.offline { background: var(--alerta); }
 
-  .punto-conexion {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--gris);
-    flex-shrink: 0;
-  }
-  .punto-conexion.conectado { background: #2FB65A; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
 
-  main {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-
-  .grid-sectores {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
+  /* SECTORES */
+  .grid-sectores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
   .tarjeta-sector {
-    background: var(--blanco);
-    border-radius: 12px;
-    padding: 12px 6px;
-    text-align: center;
+    background: var(--blanco); border-radius: 12px;
+    padding: 12px 6px; text-align: center;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    position: relative;
   }
-
+  .badge-p2 {
+    position: absolute; top: 5px; right: 5px;
+    font-size: 8px; font-weight: 700; color: var(--naranja);
+    font-family: 'IBM Plex Mono', monospace;
+  }
   .tarjeta-sector .nombre {
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11px; font-weight: 700; margin-bottom: 8px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-
   .circulo-icono {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--gris);
-    margin: 0 auto 8px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--azul); margin: 0 auto 8px auto;
+    display: flex; align-items: center; justify-content: center;
     transition: background 0.2s ease;
   }
+  .circulo-icono svg { width: 28px; height: 28px; }
+  .tarjeta-sector .estado-texto { font-size: 10px; color: var(--texto-tenue); }
 
-  .circulo-icono svg { width: 37px; height: 37px; }
-
-  .tarjeta-sector .estado-texto {
-    font-size: 10px;
-    color: var(--texto-tenue);
-  }
-
-  .mensaje-cargando {
-    text-align: center;
-    color: var(--texto-tenue);
-    padding: 60px 20px;
-    font-size: 14px;
-    grid-column: 1 / -1;
-  }
-
-  /* --- Sección Programas (desplegable) --- */
-  .seccion-programas {
-    background: var(--blanco);
-    border-radius: 12px;
-    margin-top: 16px;
+  /* TARJETA ESTADO */
+  .tarjeta-card {
+    background: var(--blanco); border-radius: 12px;
+    padding: 16px; margin-top: 16px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    overflow: hidden;
   }
-  .seccion-programas .cabecera {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
+  .tarjeta-card h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #fff; margin: 0 0 12px 0;
+    background: var(--verde-ws); padding: 8px 12px; border-radius: 8px;
+    transition: background 0.3s ease;
   }
-  .seccion-programas .cabecera h2 {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--texto-tenue);
-    margin: 0;
+  .tarjeta-card h2.parpadeo {
+    animation: parpadeoRojo 1s infinite;
   }
-  .seccion-programas .flecha {
-    transition: transform 0.2s ease;
-    color: var(--texto-tenue);
-    font-size: 14px;
-  }
-  .seccion-programas.abierta .flecha { transform: rotate(180deg); }
-  .seccion-programas .cuerpo {
-    display: none;
-    padding: 0 16px 16px 16px;
-  }
-  .seccion-programas.abierta .cuerpo { display: block; }
+  .fila-estado { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #F0F0F0; }
+  .fila-estado:last-child { border-bottom: none; }
+  .fila-estado span:first-child { color: var(--texto-tenue); }
+  .fila-estado span:last-child  { color: var(--texto); font-weight: 600; }
+  .barra-progreso { height: 6px; background: #E0E0E0; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .barra-fill { height: 100%; background: var(--azul); border-radius: 3px; transition: width 1s linear; }
 
-  select.campo, input.campo {
-    background: var(--fondo);
-    border: 1px solid var(--gris);
-    border-radius: 6px;
-    color: var(--texto);
-    padding: 8px;
-    font-size: 12px;
-    font-family: 'Manrope', sans-serif;
-    width: 100%;
+  /* BOTONES CONTROL FIJOS */
+  .botones-fijos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+  .btn-ctrl {
+    padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700;
+    border: 1px solid var(--gris); background: var(--blanco); color: var(--texto);
   }
-  .fila-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-  .fila-triple { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .btn-ctrl.primario { background: var(--azul); color: #fff; border-color: var(--azul); }
+  .btn-ctrl.peligro { background: var(--alerta); color: #fff; border-color: var(--alerta); }
+  .btn-ctrl:disabled { opacity: 0.4; }
 
-  button.btn-accion {
-    background: var(--azul);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
+  /* RIEGO MANUAL */
+  .manual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  .btn-sector-manual {
+    padding: 8px 4px; border-radius: 8px; font-size: 11px; font-weight: 700;
+    border: 1px solid var(--gris); background: var(--blanco); color: var(--texto); text-align: center;
   }
-  button.btn-accion:active { opacity: 0.8; }
-  button.btn-secundario {
-    background: transparent;
-    color: var(--texto);
-    border: 1px solid var(--gris);
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 12px;
-    cursor: pointer;
+  .btn-sector-manual.p2 { border-style: dashed; display: none; }
+  .btn-sector-manual.sel { background: var(--azul); color: #fff; border-color: var(--azul); }
+  .fila-manual { display: flex; align-items: center; gap: 8px; }
+  .fila-manual label { font-size: 13px; font-weight: 600; color: var(--texto-tenue); white-space: nowrap; }
+  .input-min {
+    width: 70px; padding: 8px; text-align: center;
+    border: 1px solid var(--gris); border-radius: 8px;
+    font-size: 15px; font-weight: 700; outline: none; background: var(--fondo);
   }
+  .input-min:focus { border-color: var(--azul); }
 
-  .tarjeta-sector-prog {
-    border: 1px solid var(--gris);
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 8px;
+  /* SECCION DESPLEGABLE */
+  .seccion {
+    background: var(--blanco); border-radius: 12px;
+    margin-top: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden;
   }
+  .seccion .cabecera {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer; user-select: none;
+  }
+  .seccion .cabecera h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-tenue); margin: 0; }
+  .seccion .flecha { color: var(--texto-tenue); font-size: 14px; transition: transform 0.2s; }
+  .seccion.abierta .flecha { transform: rotate(180deg); }
+  .seccion .cuerpo { display: none; padding: 0 16px 16px; }
+  .seccion.abierta .cuerpo { display: block; }
 
+  /* PROGRAMAS */
+  .tabs-prog { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tab-prog {
+    padding: 6px 12px; border: 1px solid var(--gris); border-radius: 20px;
+    font-size: 12px; font-weight: 700; background: var(--blanco); color: var(--texto-tenue);
+  }
+  .tab-prog.activo { border-color: var(--azul); color: var(--azul); background: rgba(25,118,210,0.1); }
+
+  .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
+  .switch-label { font-size: 13px; font-weight: 600; }
+  .switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-track { position: absolute; inset: 0; border-radius: 11px; background: #CCC; transition: background 0.2s; }
+  .switch input:checked + .switch-track { background: var(--azul); }
+  .switch-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+  .switch input:checked ~ .switch-thumb { transform: translateX(18px); }
+
+  .campo-hora { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
+  .campo-hora label { font-size: 13px; font-weight: 600; }
+  .campo-hora input { width: 90px; padding: 7px; text-align: center; border: 1px solid var(--gris); border-radius: 8px; font-size: 14px; font-weight: 700; outline: none; }
+  .campo-hora input:focus { border-color: var(--azul); }
+
+  .dias-wrap { display: flex; gap: 5px; padding: 8px 0; flex-wrap: wrap; border-bottom: 1px solid #F0F0F0; }
+  .dia-chip { padding: 5px 9px; border: 1px solid var(--gris); border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--texto-tenue); cursor: pointer; user-select: none; }
+  .dia-chip.sel { border-color: var(--azul); color: var(--azul); background: rgba(25,118,210,0.1); }
+
+  .sector-row { display: grid; grid-template-columns: 28px 1fr 56px 56px; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
+  .sector-row:last-child { border-bottom: none; }
+  .sector-nombre { font-size: 12px; font-weight: 600; }
+  .dur-inp { width: 100%; padding: 6px; text-align: center; border: 1px solid var(--gris); border-radius: 6px; font-size: 13px; font-weight: 700; outline: none; }
+  .dur-inp:focus { border-color: var(--azul); }
+  .dur-inp:disabled { opacity: 0.35; background: #F5F5F5; }
+
+  .fert-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; align-items: center; }
+  .fert-label { font-size: 11px; font-weight: 600; color: var(--texto-tenue); }
+  .fert-inp { width: 100%; padding: 6px; text-align: center; border: 1px solid var(--gris); border-radius: 6px; font-size: 12px; font-weight: 700; outline: none; }
+  .fert-inp:focus { border-color: var(--azul); }
+  .fert-inp:disabled { opacity: 0.35; background: #F5F5F5; }
+
+  .btns-prog { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-guardar { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
+  .btn-iniciar-prog { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
+
+  /* HISTORIAL */
+  .fila-historial { padding: 10px 0; border-bottom: 1px solid #F0F0F0; }
+  .fila-historial:last-child { border-bottom: none; }
+  .fila-historial .linea1 { font-size: 13px; font-weight: 700; }
+  .fila-historial .linea2 { font-size: 11px; color: var(--texto-tenue); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* TOAST */
   .toast-guardado {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--texto);
-    color: var(--blanco);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 100;
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--texto); color: var(--blanco); padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease; z-index: 100;
   }
   .toast-guardado.visible { opacity: 1; }
 
-  /* --- Tarjeta de Estado (rotativa: Riego/Aux1/Aux2) --- */
-  .tarjeta-estado {
-    background: var(--blanco);
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  .tarjeta-estado h2 {
-    font-size: 15px;
-    margin: 0 0 12px 0;
-    color: var(--texto);
-  }
-  .tarjeta-estado .fila-estado {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    font-size: 13px;
-  }
-  .tarjeta-estado .fila-estado span:first-child { color: var(--texto-tenue); }
-  .tarjeta-estado .fila-estado span:last-child { color: var(--texto); font-weight: 600; }
-  .tarjeta-estado .botones-control {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 14px;
-  }
-  .btn-pausa {
-    background: var(--azul);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .btn-pausa.en-pausa { background: #E24C4C; }
-  .btn-saltar {
-    background: var(--azul);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .btn-detener-todo {
-    background: var(--azul);
-    color: var(--blanco);
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .btn-detener-todo.activo { background: #E24C4C; }
+  .msg-cargando { text-align: center; color: var(--texto-tenue); padding: 40px 20px; font-size: 14px; }
+  .badge-placa2 { display: inline-block; font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; padding: 2px 6px; border-radius: 10px; background: rgba(230,81,0,0.12); color: var(--naranja); margin-left: 4px; }
+  .badge-placa2.ok { background: rgba(37,211,102,0.12); color: var(--verde-ws); }
 
-  .fila-historial {
-    border-bottom: 1px solid var(--gris);
-    padding: 8px 0;
-    font-size: 12px;
-  }
-  .fila-historial:last-child { border-bottom: none; }
-  .fila-historial .linea1 { font-weight: 600; color: var(--texto); }
-  .fila-historial .linea2 { color: var(--texto-tenue); margin-top: 2px; }
-  .fila-historial.con-falla .linea1 { color: #E24C4C; }
+  .pausa-alerta { display: inline-block; background: var(--alerta); color: #fff !important; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 </style>
 </head>
 <body>
 
 <header>
-  <button id="btnVolver">‹</button>
+  <button id="btnVolver" onclick="window.location.href='./unidades.html'">‹</button>
   <div class="titulos">
     <h1 id="nombreEquipo">Cargando…</h1>
-    <p id="deviceIdTexto"></p>
+    <p id="idEquipo">—</p>
   </div>
-  <div class="punto-conexion" id="puntoConexion"></div>
+  <span class="conexion-badge offline" id="conexionBadge">OFF LINE</span>
 </header>
 
-<main>
-  <div class="grid-sectores" id="gridSalidas">
-    <p class="mensaje-cargando">Cargando salidas…</p>
-  </div>
-
-  <div class="tarjeta-estado">
-    <div class="fila-estado" style="border-bottom:1px solid var(--gris); padding-bottom:10px; margin-bottom:6px;">
-      <span>Hora del equipo</span><span id="horaEquipoTexto">--:--:--</span>
-    </div>
-    <h2 id="tarjetaEstadoTitulo">Riego</h2>
-    <div class="fila-estado"><span>Estado</span><span id="tarjetaEstadoEstado">--</span></div>
-    <div class="fila-estado"><span>Sector activo</span><span id="tarjetaEstadoSector">--</span></div>
-    <div class="fila-estado"><span>Tiempo transcurrido</span><span id="tarjetaEstadoTranscurrido">--</span></div>
-    <div class="fila-estado"><span>Tiempo restante</span><span id="tarjetaEstadoRestante">--</span></div>
-    <div class="fila-estado" id="filaCaudalWeb"><span>Caudal regado</span><span id="tarjetaEstadoCaudal">--</span></div>
-    <div class="botones-control">
-      <button class="btn-pausa" id="btnPausarWeb">Pausar Riego</button>
-      <button class="btn-saltar" id="btnSaltarWeb">Saltar sector (Riego)</button>
-    </div>
-    <button class="btn-detener-todo" id="btnDetenerTodoWeb" style="width:100%; margin-top:8px;">Detener todo</button>
-  </div>
-
-  <div class="seccion-programas" id="seccionProgramas">
-    <div class="cabecera" id="cabeceraProgramas">
-      <h2>Programas de Riego</h2>
-      <span class="flecha">▾</span>
-    </div>
-    <div class="cuerpo">
-      <div class="fila-triple">
-        <select class="campo" id="progSeleccionado">
-          <option value="0">Riego 1</option>
-          <option value="1">Riego 2</option>
-          <option value="2">Riego 3</option>
-          <option value="3">Riego 4</option>
-          <option value="4">Riego Manual</option>
-          <option value="5">Aux 1</option>
-          <option value="6">Aux 2</option>
-        </select>
-        <button class="btn-secundario" id="btnCargarPrograma">Cargar actual</button>
-        <button class="btn-accion" id="btnGuardarPrograma">Guardar programa</button>
-      </div>
-      <button class="btn-accion" id="btnIniciarAhora" style="width:100%; margin-bottom:14px; background:var(--verde, #2E9E5B);">
-        Iniciar ahora (sin esperar hora/día programado)
-      </button>
-
-      <div class="fila-doble">
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px;">
-          <input type="checkbox" id="progActivo"> Activo
-        </label>
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px;">
-          <input type="checkbox" id="progLoop"> Loop
-        </label>
-      </div>
-
-      <div class="fila-doble">
-        <input class="campo" type="number" id="progHora" placeholder="Hora inicio (0-23)" min="0" max="23">
-        <input class="campo" type="number" id="progMin" placeholder="Minuto inicio (0-59)" min="0" max="59">
-      </div>
-
-      <div id="diasSemana" style="display:flex; gap:6px; margin-bottom:14px;"></div>
-
-      <div id="filasSectoresPrograma"></div>
-    </div>
-  </div>
-  <div class="seccion-programas" id="seccionAlertas">
-    <div class="cabecera" id="cabeceraAlertas">
-      <h2>Alertas (últimas 50)</h2>
-      <span class="flecha">▾</span>
-    </div>
-    <div class="cuerpo">
-      <div id="listaAlertas"><p class="mensaje-cargando">Despliega para cargar…</p></div>
-    </div>
-  </div>
-
-  <div class="seccion-programas" id="seccionHistorial">
-    <div class="cabecera" id="cabeceraHistorial">
-      <h2>Últimos Riegos (últimos 50)</h2>
-      <span class="flecha">▾</span>
-    </div>
-    <div class="cuerpo">
-      <div id="listaHistorial"><p class="mensaje-cargando">Despliega para cargar…</p></div>
-    </div>
-  </div>
+<main id="main">
+  <p class="msg-cargando">Conectando…</p>
 </main>
 
-<div class="toast-guardado" id="toastGuardado"></div>
+<div class="toast-guardado" id="toast"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-  import {
-    getFirestore, collection, query, where, getDocs
-  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, getDocs, setDoc, collection } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDfW9yzIoBAGxCvxZs6679Qn0_df_rkfZg",
-    authDomain: "pluo-pantalla.firebaseapp.com",
-    projectId: "pluo-pantalla",
-    storageBucket: "pluo-pantalla.firebasestorage.app",
-    messagingSenderId: "432080738709",
-    appId: "1:432080738709:web:6b83df90372f981fa27e9c"
+    apiKey:            "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+    authDomain:        "pluo-compact-cef5og.firebaseapp.com",
+    projectId:         "pluo-compact-cef5og",
+    storageBucket:     "pluo-compact-cef5og.firebasestorage.app",
+    messagingSenderId: "443227636027",
+    appId:             "1:443227636027:web:c8459adcd92cec1d23f71e"
   };
 
-  const app = initializeApp(firebaseConfig);
+  const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
+  const db   = getFirestore(app);
 
-  // El equipo tiene 12 salidas físicas configurables individualmente
-  // (RIEGO / BOMBA / BOMBA_INY / VALV_INY / AUX), según el campo "tipo"
-  // que responde cada GETSALIDA:n.
-  const NUM_SALIDAS = 14;
-  const MAX_SECTORES = 10;
-  const DIAS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+  /* ---------- CONFIG ---------- */
+  const MQTT_HOST = 'e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud';
+  const MQTT_USER = 'pluo_firmware';
+  const MQTT_PASS = 'Pluo2012';
+  const NUM_SECTORES = 12;
+  const DIAS_NOMBRES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-  const COLOR_POR_TIPO = {
-    RIEGO:     '#2FB65A',
-    BOMBA:     '#1976D2',
-    BOMBA_INY: '#F5821F',
-    VALV_INY:  '#F5821F',
-    AUX:       '#00B8A9'
-  };
-  const COLOR_FERTILIZANDO = '#FFB800';
+  /* ---------- ESTADO ---------- */
+  let deviceId, unidad, salidas = {}, programas = {};
+  let mqttClient, tokenOp, tokenObs;
+  let estadoActual = {};
+  let sectorManualSel = 1;
+  let progActual = 1;
 
-  const NOMBRE_POR_TIPO = {
-    RIEGO:     'Sector de Riego',
-    BOMBA:     'Bomba',
-    BOMBA_INY: 'Bomba Inyectora',
-    VALV_INY:  'Válvula Inyectora',
-    AUX:       'Auxiliar'
-  };
-
+  /* ---------- INIT ---------- */
   const params = new URLSearchParams(window.location.search);
-  const deviceId = params.get('id');
+  deviceId = params.get('id');
+  if (!deviceId) { window.location.href = './unidades.html'; }
 
-  const nombreEquipo = document.getElementById('nombreEquipo');
-  const deviceIdTexto = document.getElementById('deviceIdTexto');
-  const gridSalidas = document.getElementById('gridSalidas');
-  const puntoConexion = document.getElementById('puntoConexion');
-  const btnVolver = document.getElementById('btnVolver');
+  document.getElementById('idEquipo').textContent = deviceId;
 
-  btnVolver.addEventListener('click', () => {
-    window.location.href = 'unidades.html';
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = './index.html'; return; }
+    await cargarDatos();
+    
+    // ASIGNAR A WINDOW DESPUÉS DE cargarDatos()
+    window.tokenOp = tokenOp;
+    window.tokenObs = tokenObs;
+    window.pub = pub;
+    window.mostrarToast = mostrarToast;
+    
+    renderUI();
+    conectarMQTT();
   });
 
-  if (!deviceId) {
-    nombreEquipo.textContent = 'Equipo no especificado';
-    gridSalidas.innerHTML = '<p class="mensaje-cargando">Falta el parámetro ?id= en la URL.</p>';
-  } else {
-    deviceIdTexto.textContent = deviceId;
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
+  /* ---------- FIRESTORE ---------- */
+  async function cargarDatos() {
+    const snap = await getDoc(doc(db, 'Unidades', deviceId));
+    if (!snap.exists()) { window.location.href = './unidades.html'; return; }
+    unidad = { id: deviceId, ...snap.data() };
+    tokenObs = unidad.token_observador || 'OBS-CTRL-7f21';
+    tokenOp  = 'OP-CTRL-4m9q';
+    document.getElementById('nombreEquipo').textContent = unidad.nombre || deviceId;
+
+    // Salidas
+    salidas = {};
+    const sSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Salidas'));
+    sSnap.forEach(d => { salidas[d.id] = d.data(); });
+
+    // Programas
+    programas = {};
+    const pSnap = await getDocs(collection(db, 'Unidades', deviceId, 'Programas'));
+    pSnap.forEach(d => { programas[d.id] = d.data(); });
+    for (let p = 1; p <= 5; p++) {
+      if (!programas[String(p)]) {
+        programas[String(p)] = { 
+          activo: false, hora_inicio: '00:00', dias: [false,false,false,false,false,false,false], 
+          sectores: {},
+          fertilizacion: { agua_antes: 0, litros: 0, agua_despues: 0 }
+        };
       }
-      await cargarEquipo(user.uid, deviceId);
+      for (let s = 1; s <= NUM_SECTORES; s++) {
+        if (!programas[String(p)].sectores) programas[String(p)].sectores = {};
+        if (!programas[String(p)].sectores[String(s)]) {
+          programas[String(p)].sectores[String(s)] = { habilitado: false, horas: 0, minutos: 0 };
+        }
+      }
+    }
+  }
+
+  /* ---------- MQTT ---------- */
+  function pub(cmd, token) {
+    if (!mqttClient?.connected) return;
+    mqttClient.publish(`ctrl12/${deviceId}/cmd`, `${token||tokenObs}:${cmd}`);
+  }
+
+  function conectarMQTT() {
+    mqttClient = mqtt.connect(`wss://${MQTT_HOST}:8884/mqtt`, {
+      username: MQTT_USER, password: MQTT_PASS,
+      clientId: 'ctrl12eq_' + Math.random().toString(16).slice(2)
+    });
+
+    mqttClient.on('connect', () => {
+      document.getElementById('conexionBadge').classList.remove('offline');
+      document.getElementById('conexionBadge').classList.add('online');
+      document.getElementById('conexionBadge').textContent = 'ON LINE';
+      mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
+      pub('GETESTADO');
+      setInterval(() => pub('GETESTADO'), 3000);
+    });
+
+    mqttClient.on('message', (topic, payload) => {
+      const msg = payload.toString();
+      if (msg.startsWith('EST:')) procesarEstado(msg);
+    });
+
+    mqttClient.on('error', err => {
+      console.error('MQTT:', err);
+      document.getElementById('conexionBadge').classList.remove('online');
+      document.getElementById('conexionBadge').classList.add('offline');
+      document.getElementById('conexionBadge').textContent = 'OFF LINE';
     });
   }
 
-  async function cargarEquipo(uid, deviceId) {
-    const q = query(
-      collection(db, 'unidades'),
-      where('cliente_ref', '==', uid),
-      where('device_id', '==', deviceId)
-    );
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      nombreEquipo.textContent = 'Equipo no encontrado';
-      gridSalidas.innerHTML = '<p class="mensaje-cargando">No tienes acceso a este equipo o no existe.</p>';
-      return;
-    }
-
-    const unidad = snap.docs[0].data();
-    nombreEquipo.textContent = unidad.nombre || deviceId;
-
-    construirTarjetasSalidas(NUM_SALIDAS);
-    construirDiasSemana();
-    construirFilasSectoresPrograma();
-    inicializarSeccionProgramas();
-    inicializarControlesEstado();
-    inicializarSeccionesHistorial();
-    conectarMQTT(unidad, deviceId);
+  function procesarEstado(msg) {
+    const p = msg.split(':');
+    estadoActual = {
+      sector:   parseInt(p[1])||0,
+      programa: parseInt(p[2])||0,
+      m3:       parseFloat(p[3])||0,
+      estado:   parseInt(p[4])||0,
+      elapsed:  parseInt(p[5])||0,
+      hCfg:     parseInt(p[6])||0,
+      mCfg:     parseInt(p[7])||0,
+      pausa:    p[8]==='1',
+      modo:     parseInt(p[9])||0,
+      durTotal: parseInt(p[10])||0,
+      placa2:   p[11]||'TIMEOUT',
+      hora:     p[12]||'00:00'
+    };
+    actualizarEstadoUI();
   }
 
-  // --- Íconos por tipo (accent = color según estado, se pasa como parámetro) ---
+  /* ---------- RENDER ---------- */
+  function renderUI() {
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <!-- GRID 12 SECTORES -->
+      <div class="grid-sectores" id="gridSectores">
+        ${[...Array(NUM_SECTORES)].map((_,i) => {
+          const s = i+1;
+          const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
+          const p2 = s > 6;
+          return `
+            <div class="tarjeta-sector" id="sect-${s}">
+              ${p2 ? '<span class="badge-p2" id="badge-p2-${s}">P2</span>' : ''}
+              <div class="nombre">${nombre}</div>
+              <div class="circulo-icono" id="circulo-${s}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                  <path d="M12 2C8 2 4 6 4 10c0 5 8 12 8 12s8-7 8-12c0-4-4-8-8-8z"/>
+                </svg>
+              </div>
+              <div class="estado-texto" id="etxt-${s}">No activo</div>
+            </div>`;
+        }).join('')}
+      </div>
 
-  function iconoValvula(accent, cuerpo = 'white') {
-    return `
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="30" y="4" width="4" height="10" fill="${cuerpo}"/>
-        <rect x="20" y="4" width="24" height="4" rx="1" fill="${cuerpo}"/>
-        <rect x="29" y="14" width="6" height="6" fill="${cuerpo}"/>
-        <rect x="22" y="26" width="20" height="16" rx="2" fill="${cuerpo}"/>
-        <circle cx="32" cy="34" r="4" fill="${accent}"/>
-        <rect x="6" y="24" width="4" height="20" fill="${cuerpo}"/>
-        <rect x="10" y="28" width="4" height="12" fill="${cuerpo}"/>
-        <rect x="14" y="30" width="8" height="8" fill="${cuerpo}"/>
-        <rect x="54" y="24" width="4" height="20" fill="${cuerpo}"/>
-        <rect x="50" y="28" width="4" height="12" fill="${cuerpo}"/>
-        <rect x="42" y="30" width="8" height="8" fill="${cuerpo}"/>
-      </svg>
-    `;
-  }
+      <!-- TARJETA ESTADO -->
+      <div class="tarjeta-card">
+        <h2 id="estadoTitulo">Estado de Riego</h2>
+        <div id="estadoLive"></div>
+      </div>
 
-  function iconoBomba(accent, cuerpo = 'white') {
-    return `
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="30" width="10" height="8" rx="1.5" fill="${cuerpo}"/>
-        <rect x="12" y="22" width="20" height="24" rx="2" fill="${cuerpo}"/>
-        <rect x="16" y="27" width="12" height="2.4" fill="${accent}"/>
-        <rect x="16" y="32" width="12" height="2.4" fill="${accent}"/>
-        <rect x="16" y="37" width="12" height="2.4" fill="${accent}"/>
-        <circle cx="42" cy="34" r="15" fill="${cuerpo}"/>
-        <circle cx="42" cy="34" r="5" fill="${accent}"/>
-        <circle cx="42" cy="21" r="2" fill="${cuerpo}" stroke="${accent}" stroke-width="1"/>
-        <circle cx="55" cy="34" r="2" fill="${cuerpo}" stroke="${accent}" stroke-width="1"/>
-        <circle cx="42" cy="47" r="2" fill="${cuerpo}" stroke="${accent}" stroke-width="1"/>
-        <circle cx="29" cy="34" r="2" fill="${cuerpo}" stroke="${accent}" stroke-width="1"/>
-        <rect x="50" y="6" width="8" height="10" rx="1.5" fill="${cuerpo}"/>
-        <rect x="49" y="14" width="10" height="6" fill="${cuerpo}"/>
-        <rect x="10" y="46" width="44" height="4" rx="1" fill="${cuerpo}"/>
-        <rect x="16" y="50" width="5" height="5" fill="${cuerpo}"/>
-        <rect x="43" y="50" width="5" height="5" fill="${cuerpo}"/>
-      </svg>
-    `;
-  }
+      <!-- BOTONES FIJOS -->
+      <div class="botones-fijos">
+        <button class="btn-ctrl peligro" onclick="accionDetener()">Detener</button>
+        <button class="btn-ctrl" onclick="accionSaltar()">Saltar</button>
+        <button class="btn-ctrl primario" id="btnPausa" onclick="accionPausa()">Pausar</button>
+        <button class="btn-ctrl" onclick="pedirHistorial()">Historial</button>
+      </div>
 
-  function iconoAux(cuerpo = 'white') {
-    return `
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="24" cy="26" r="16" stroke="${cuerpo}" stroke-width="4" fill="none"/>
-        <path d="M24 6 L24 22" stroke="${cuerpo}" stroke-width="4" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  function generarIcono(tipo, accent, cuerpo = 'white') {
-    if (tipo === 'RIEGO' || tipo === 'VALV_INY') return iconoValvula(accent, cuerpo);
-    if (tipo === 'BOMBA' || tipo === 'BOMBA_INY') return iconoBomba(accent, cuerpo);
-    if (tipo === 'AUX') return iconoAux(cuerpo);
-    return '';
-  }
-
-  function construirTarjetasSalidas(n) {
-    gridSalidas.innerHTML = '';
-    for (let i = 1; i <= n; i++) {
-      const div = document.createElement('div');
-      div.className = 'tarjeta-sector';
-      div.id = `salida-${i}`;
-      div.innerHTML = `
-        <div class="nombre" id="nombre-${i}">Salida ${i}</div>
-        <div class="circulo-icono" id="icono-${i}"></div>
-        <div class="estado-texto" id="estado-${i}">Consultando…</div>
-      `;
-      gridSalidas.appendChild(div);
-    }
-  }
-
-  // ============================================================
-  // Programas de Riego (SETPROG / SETSECTOR / SETFERT — nivel Operador)
-  // ============================================================
-
-  let tokenOperador = null;
-  let publicarComandoOperador = null;
-  let salidasInfo = {};  // n -> {tipo, sectorAsoc} -- para filtrar sectores en Aux1/Aux2
-
-  function mostrarToast(msg) {
-    const toast = document.getElementById('toastGuardado');
-    toast.textContent = msg;
-    toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2200);
-  }
-
-  function inicializarSeccionProgramas() {
-    const seccion = document.getElementById('seccionProgramas');
-    const cabecera = document.getElementById('cabeceraProgramas');
-    cabecera.addEventListener('click', () => {
-      seccion.classList.toggle('abierta');
-    });
-
-    document.getElementById('progSeleccionado').addEventListener('change', construirFilasSectoresPrograma);
-    document.getElementById('btnCargarPrograma').addEventListener('click', cargarPrograma);
-    document.getElementById('btnGuardarPrograma').addEventListener('click', guardarPrograma);
-    document.getElementById('btnIniciarAhora').addEventListener('click', () => {
-      if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-      const idx = document.getElementById('progSeleccionado').value;
-      publicarComandoOperador(`INICIAR:${idx}`);
-      mostrarToast('Comando de inicio enviado.');
-    });
-  }
-
-  function construirDiasSemana() {
-    const cont = document.getElementById('diasSemana');
-    cont.innerHTML = DIAS.map((d, i) => `
-      <label style="display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--texto-tenue);">
-        <input type="checkbox" id="dia-${i}">
-        ${d}
-      </label>
-    `).join('');
-  }
-
-  function sectoresAuxDisponibles() {
-    const set = new Set();
-    for (const n in salidasInfo) {
-      if (salidasInfo[n].tipo === 'AUX' && salidasInfo[n].sectorAsoc >= 1) set.add(salidasInfo[n].sectorAsoc - 1);
-    }
-    return [...set].sort((a, b) => a - b);
-  }
-
-  function sectoresRiegoDisponibles() {
-    const set = new Set();
-    for (const n in salidasInfo) {
-      if (salidasInfo[n].tipo === 'RIEGO' && salidasInfo[n].sectorAsoc >= 1) set.add(salidasInfo[n].sectorAsoc - 1);
-    }
-    return [...set].sort((a, b) => a - b);
-  }
-
-  function construirFilasSectoresPrograma() {
-    const esAux = parseInt(document.getElementById('progSeleccionado').value, 10) >= 5;
-    const cont = document.getElementById('filasSectoresPrograma');
-    cont.innerHTML = '';
-
-    // Igual criterio para ambos: solo se muestran sectores que tengan una
-    // salida real asociada del tipo correspondiente -- RIEGO para el
-    // programa Riego, AUX para Aux1/Aux2. Un sector sin ninguna salida
-    // asignada no aparece en ninguno de los dos.
-    const sectoresAMostrar = esAux ? sectoresAuxDisponibles() : sectoresRiegoDisponibles();
-
-    if (sectoresAMostrar.length === 0) {
-      cont.innerHTML = esAux
-        ? '<p class="mensaje-cargando">No hay salidas tipo AUX configuradas. Configúralas en la sección de Salidas.</p>'
-        : '<p class="mensaje-cargando">No hay salidas tipo RIEGO configuradas. Configúralas en la sección de Salidas.</p>';
-      return;
-    }
-
-    for (const s of sectoresAMostrar) {
-      const div = document.createElement('div');
-      div.className = 'tarjeta-sector-prog';
-      div.innerHTML = `
-        <div class="fila-triple" style="margin-bottom:${esAux ? '0' : '8px'};">
-          <label style="display:flex; align-items:center; gap:6px; font-size:12px;">
-            <input type="checkbox" id="sec-hab-${s}"> ${(() => { const k = Object.keys(salidasInfo).find(n => salidasInfo[n].sectorAsoc === s + 1 && salidasInfo[n].tipo === (esAux ? 'AUX' : 'RIEGO')); return k ? salidasInfo[k].nombre : ('Sector ' + (s + 1)); })()}
-          </label>
-          <input class="campo" type="number" id="sec-hh-${s}" placeholder="hh" min="0" max="23">
-          <input class="campo" type="number" id="sec-mm-${s}" placeholder="mm" min="0" max="59">
+      <!-- RIEGO MANUAL -->
+      <div class="seccion abierta">
+        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
+          <h2>Riego Manual</h2>
+          <span class="flecha">▼</span>
         </div>
-        ${esAux ? '' : `
-        <div class="fila-doble" style="margin-bottom:6px;">
-          <label style="display:flex; align-items:center; gap:6px; font-size:12px;">
-            <input type="checkbox" id="sec-fert-activa-${s}" onchange="window.toggleFertSector(${s})"> Fertilización
-          </label>
-          <select class="campo" id="sec-fert-tipo-${s}" style="display:none;">
-            <option value="1">Directo (litros objetivo)</option>
-            <option value="2">Fraccionado (pulsos adaptativos)</option>
-          </select>
+        <div class="cuerpo">
+          <div class="manual-grid" id="gridManual">
+            ${[...Array(NUM_SECTORES)].map((_,i) => {
+              const s = i+1;
+              const p2 = s > 6 ? 'p2' : '';
+              return `<button class="btn-sector-manual ${p2}" id="btn-manual-${s}" onclick="selSector(${s})">Sector ${s}</button>`;
+            }).join('')}
+          </div>
+          <div class="fila-manual">
+            <label>Minutos:</label>
+            <input type="number" class="input-min" id="inputMin" value="5" min="1" max="600">
+            <button class="btn-ctrl primario" onclick="accionManual()">Activar</button>
+          </div>
         </div>
-        <div class="fila-triple" id="sec-fert-campos-${s}" style="display:none;">
-          <input class="campo" type="number" id="sec-fert-litros-${s}" placeholder="Litros">
-          <input class="campo" type="number" id="sec-fert-antes-${s}" placeholder="Agua antes (min)">
-          <input class="campo" type="number" id="sec-fert-despues-${s}" placeholder="Agua después (min)">
-        </div>`}
-        <button class="btn-secundario" style="width:100%; margin-top:4px;" data-sector="${s}">
-          Guardar ${esAux ? 'salida' : 'sector'} ${s + 1}
-        </button>
-      `;
-      div.querySelector('button[data-sector]').addEventListener('click', () => guardarSector(s));
-      cont.appendChild(div);
+      </div>
+
+      <!-- PROGRAMAS -->
+      <div class="seccion abierta">
+        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
+          <h2>Programas</h2>
+          <span class="flecha">▼</span>
+        </div>
+        <div class="cuerpo" id="seccionProgramas"></div>
+      </div>
+
+      <!-- HISTORIAL -->
+      <div class="seccion">
+        <div class="cabecera" onclick="this.parentElement.classList.toggle('abierta')">
+          <h2>Historial</h2>
+          <span class="flecha">▼</span>
+        </div>
+        <div class="cuerpo" id="historialCuerpo"></div>
+      </div>
+    `;
+    selSector(1);
+    selProg(1);
+    actualizarEstadoUI();
+  }
+
+  /* ---------- ESTADO UI ---------- */
+  function actualizarEstadoUI() {
+    const e = estadoActual;
+    const estados = ['Inactivo','Regando','Falla','Config'];
+    const el = document.getElementById('estadoLive');
+    const titulo = document.getElementById('estadoTitulo');
+    
+    if (!el || !titulo) return;
+
+    // Aplicar parpadeo si hay pausa
+    if (e.pausa) {
+      titulo.classList.add('parpadeo');
+    } else {
+      titulo.classList.remove('parpadeo');
+    }
+
+    const pct = e.durTotal > 0 ? Math.min(100, Math.round(e.elapsed/e.durTotal*100)) : 0;
+    const rest = Math.max(0, e.durTotal - e.elapsed);
+    const p2cls = e.placa2 === 'OK' ? 'ok' : '';
+    const sectorNombre = e.sector > 0 ? (salidas[String(e.sector)]?.nombre || `Sector ${e.sector}`) : '—';
+    const pausaHTML = e.pausa ? `<div class="fila-estado"><span>Pausa</span><span class="pausa-alerta" style="color: #fff !important;">PAUSADO</span></span></div>` : '';
+
+    el.innerHTML = `
+      <div class="fila-estado"><span>Estado</span><span>${estados[e.estado]||'?'}</span></div>
+      <div class="fila-estado"><span>Sector activo</span><span>${sectorNombre}</span></div>
+      <div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>
+      <div class="fila-estado"><span>Transcurrido</span><span>${fmtSeg(e.elapsed)}</span></div>
+      <div class="fila-estado"><span>Restante</span><span>${fmtSeg(rest)}</span></div>
+      <div class="fila-estado"><span>Hora</span><span>${e.hora}</span></div>
+      <div class="fila-estado"><span>Placa 2</span><span><span class="badge-placa2 ${p2cls}">${e.placa2}</span></span></div>
+      ${pausaHTML}
+      ${e.estado===1?`<div class="barra-progreso"><div class="barra-fill" style="width:${pct}%"></div></div>`:''}
+    `;
+
+    // Actualizar grid sectores y ocultar placa 2 si está down
+    const placa2Down = e.placa2 !== 'OK';
+    for (let s = 1; s <= NUM_SECTORES; s++) {
+      const circulo = document.getElementById(`circulo-${s}`);
+      const etxt    = document.getElementById(`etxt-${s}`);
+      const badge   = document.getElementById(`badge-p2-${s}`);
+      const btnMan  = document.getElementById(`btn-manual-${s}`);
+      
+      if (!circulo || !etxt) continue;
+      
+      // Ocultar sectores 7-12 si placa 2 está down
+      if (s > 6 && placa2Down) {
+        circulo.parentElement.style.display = 'none';
+        if (btnMan) btnMan.style.display = 'none';
+      } else {
+        circulo.parentElement.style.display = 'block';
+        if (btnMan) btnMan.style.display = 'block';
+      }
+      
+      // Ocultar badge P2 si placa 2 está down
+      if (badge) badge.style.display = placa2Down ? 'none' : 'block';
+      
+      if (s === e.sector && e.estado === 1) {
+        circulo.style.background = 'var(--verde-ws)';
+        etxt.textContent = e.pausa ? 'Pausado' : 'Regando';
+      } else {
+        circulo.style.background = 'var(--azul)';
+        etxt.textContent = 'No activo';
+      }
+    }
+
+    // Botón pausa
+    const btnP = document.getElementById('btnPausa');
+    if (btnP) {
+      if (e.pausa) {
+        btnP.textContent = 'Reanudar';
+        btnP.classList.add('peligro');
+        btnP.classList.remove('primario');
+      } else {
+        btnP.textContent = 'Pausar';
+        btnP.classList.remove('peligro');
+        btnP.classList.add('primario');
+      }
     }
   }
 
-  window.toggleFertSector = function (s) {
-    const activa = document.getElementById(`sec-fert-activa-${s}`).checked;
-    const campos = document.getElementById(`sec-fert-campos-${s}`);
-    const tipoSelect = document.getElementById(`sec-fert-tipo-${s}`);
-    if (campos) campos.style.display = activa ? 'grid' : 'none';
-    if (tipoSelect) tipoSelect.style.display = activa ? 'block' : 'none';
+  /* ---------- ACCIONES ---------- */
+  window.selSector = function(s) {
+    sectorManualSel = s;
+    document.querySelectorAll('.btn-sector-manual').forEach((b,i) => b.classList.toggle('sel', i+1===s));
+  };
+  window.accionManual  = function() { const m = document.getElementById('inputMin')?.value||5; pub(`MANUAL:${sectorManualSel},${m}`, window.tokenOp); mostrarToast(`Sector ${sectorManualSel} por ${m} min`); };
+  window.accionDetener = function() { pub('DETENER', window.tokenOp); mostrarToast('Deteniendo riego…'); };
+  window.accionSaltar  = function() { pub('SALTAR', window.tokenOp); mostrarToast('Saltando sector…'); };
+  window.accionPausa   = function() { pub(estadoActual.pausa?'REANUDAR':'PAUSAR', window.tokenOp); };
+  window.pedirHistorial = function() { pub('GETREGISTROS', window.tokenOp); mostrarToast('Cargando historial…'); };
+
+  /* ---------- PROGRAMAS ---------- */
+  function renderProgramas() {
+    const prog = programas[String(progActual)] || {};
+    const dias = prog.dias || [false,false,false,false,false,false,false];
+    const sects = prog.sectores || {};
+    const fert = prog.fertilizacion || { agua_antes: 0, litros: 0, agua_despues: 0 };
+    return `
+      <div class="tabs-prog">
+        ${[1,2,3,4,5].map(p=>`<button class="tab-prog ${p===progActual?'activo':''}" onclick="selProg(${p})">Prog ${p}</button>`).join('')}
+      </div>
+      <div class="switch-row">
+        <span class="switch-label">Activo</span>
+        <label class="switch"><input type="checkbox" id="chkActivo" ${prog.activo?'checked':''}><div class="switch-track"></div><div class="switch-thumb"></div></label>
+      </div>
+      <div class="campo-hora">
+        <label>Hora de inicio</label>
+        <input type="text" id="inputHora" value="${prog.hora_inicio||'00:00'}" maxlength="5">
+      </div>
+      <div class="dias-wrap">
+        ${DIAS_NOMBRES.map((d,i)=>`<div class="dia-chip ${dias[i]?'sel':''}" onclick="this.classList.toggle('sel')">${d}</div>`).join('')}
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--texto-tenue)">FERTILIZACIÓN</div>
+        <div class="fert-row">
+          <div><div class="fert-label">Agua Antes (L)</div><input type="number" class="fert-inp" id="fert-antes" value="${fert.agua_antes}" min="0" max="1000"></div>
+          <div><div class="fert-label">Litros Fert</div><input type="number" class="fert-inp" id="fert-litros" value="${fert.litros}" min="0" max="1000"></div>
+          <div><div class="fert-label">Agua Después (L)</div><input type="number" class="fert-inp" id="fert-despues" value="${fert.agua_despues}" min="0" max="1000"></div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--texto-tenue)">SECTORES</div>
+        ${[...Array(NUM_SECTORES)].map((_,i) => {
+          const s = i+1;
+          const sc = sects[String(s)] || { habilitado:false, horas:0, minutos:0 };
+          const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
+          return `
+            <div class="sector-row">
+              <label class="switch" style="width:28px;height:18px">
+                <input type="checkbox" class="chk-sec" data-s="${s}" ${sc.habilitado?'checked':''} onchange="toggleSec(${s},this.checked)">
+                <div class="switch-track"></div>
+                <div class="switch-thumb" style="top:2px;left:2px;width:14px;height:14px"></div>
+              </label>
+              <span class="sector-nombre">${nombre}</span>
+              <input type="number" class="dur-inp" id="h-${s}" value="${sc.horas}" min="0" max="23" ${sc.habilitado?'':'disabled'}>
+              <input type="number" class="dur-inp" id="m-${s}" value="${sc.minutos}" min="0" max="59" ${sc.habilitado?'':'disabled'}>
+            </div>`;
+        }).join('')}
+      </div>
+      <div class="btns-prog">
+        <button class="btn-guardar" onclick="guardarProg()">Guardar</button>
+        <button class="btn-iniciar-prog" onclick="pub('INICIAR:${progActual}', window.tokenOp); mostrarToast('Iniciando programa ${progActual}…')">Iniciar ahora</button>
+      </div>
+    `;
+  }
+
+  window.selProg = function(p) {
+    progActual = p;
+    document.getElementById('seccionProgramas').innerHTML = renderProgramas();
   };
 
-  function cargarPrograma() {
-    if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-    const idx = document.getElementById('progSeleccionado').value;
-    publicarComandoOperador(`GETPROG:${idx}`);
-    for (let s = 0; s < MAX_SECTORES; s++) {
-      publicarComandoOperador(`GETSECTOR:${idx}:${s}`);
-    }
-  }
+  window.toggleSec = function(s, on) {
+    document.getElementById(`h-${s}`).disabled = !on;
+    document.getElementById(`m-${s}`).disabled = !on;
+  };
 
-  function guardarPrograma() {
-    if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-    const idx = document.getElementById('progSeleccionado').value;
-    const activo = document.getElementById('progActivo').checked ? 1 : 0;
-    const loop = document.getElementById('progLoop').checked ? 1 : 0;
-    const esAux = parseInt(idx, 10) >= 5 ? 1 : 0;
-    const hora = document.getElementById('progHora').value || '0';
-    const min = document.getElementById('progMin').value || '0';
-    const dias = DIAS.map((_, i) => document.getElementById(`dia-${i}`).checked ? 1 : 0).join(':');
-    publicarComandoOperador(`SETPROG:${idx}:${activo}:${loop}:${esAux}:${hora}:${min}:${dias}`);
-    mostrarToast('Programa guardado.');
-  }
-
-  function guardarSector(s) {
-    if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-    const idx = document.getElementById('progSeleccionado').value;
-    const hab = document.getElementById(`sec-hab-${s}`).checked ? 1 : 0;
-    const hh = document.getElementById(`sec-hh-${s}`).value || '0';
-    const mm = document.getElementById(`sec-mm-${s}`).value || '0';
-    publicarComandoOperador(`SETSECTOR:${idx}:${s}:${hab}:${hh}:${mm}`);
-
-    // Fertilización aplica a cualquiera de los 5 programas de riego (idx 0-4),
-    // no solo al primero -- los auxiliares (idx 5-6) nunca la tienen.
-    if (parseInt(idx, 10) < 5) {
-      const fertActiva = document.getElementById(`sec-fert-activa-${s}`).checked ? 1 : 0;
-      const fertTipo = document.getElementById(`sec-fert-tipo-${s}`).value;
-      const litros = document.getElementById(`sec-fert-litros-${s}`).value || '0';
-      const antes = document.getElementById(`sec-fert-antes-${s}`).value || '0';
-      const despues = document.getElementById(`sec-fert-despues-${s}`).value || '0';
-      publicarComandoOperador(`SETFERT:${idx}:${s}:${fertActiva}:${fertTipo}:${litros}:${antes}:${despues}`);
-    }
-    mostrarToast(`Sector ${s + 1} guardado.`);
-  }
-
-  // Parser de respuestas PROG:/SEC: para precargar la UI tras GETPROG/GETSECTOR
-  function procesarRespuestaPrograma(msg) {
-    if (msg.startsWith('PROG:')) {
-      const p = msg.split(':');
-      const idxSel = document.getElementById('progSeleccionado').value;
-      if (p[1] !== idxSel) return;
-      document.getElementById('progActivo').checked = p[2] === '1';
-      document.getElementById('progLoop').checked = p[3] === '1';
-      document.getElementById('progHora').value = p[5];
-      document.getElementById('progMin').value = p[6];
-      for (let i = 0; i < 7; i++) {
-        const chk = document.getElementById(`dia-${i}`);
-        if (chk) chk.checked = p[7 + i] === '1';
-      }
-    } else if (msg.startsWith('SEC:')) {
-      const p = msg.split(':');
-      const idxSel = document.getElementById('progSeleccionado').value;
-      if (p[1] !== idxSel) return;
-      const s = parseInt(p[2], 10);
-      const habEl = document.getElementById(`sec-hab-${s}`);
-      if (!habEl) return;  // sector no renderizado (filtrado en Aux1/Aux2)
-      habEl.checked = p[3] === '1';
-      document.getElementById(`sec-hh-${s}`).value = p[4];
-      document.getElementById(`sec-mm-${s}`).value = p[5];
-      const fertActiva = document.getElementById(`sec-fert-activa-${s}`);
-      if (fertActiva) {
-        fertActiva.checked = p[6] === '1';
-        document.getElementById(`sec-fert-tipo-${s}`).value = p[7];
-        document.getElementById(`sec-fert-litros-${s}`).value = p[8];
-        document.getElementById(`sec-fert-antes-${s}`).value = p[9];
-        document.getElementById(`sec-fert-despues-${s}`).value = p[10];
-        window.toggleFertSector(s);
-      }
-    }
-  }
-
-  // ============================================================
-  // Tarjeta de Estado (rotativa) -- misma lógica que la pantalla física:
-  // rota cada 10s entre los programas que estén realmente ejecutando
-  // (Riego/Aux1/Aux2). Pausa y Saltar solo controlan Riego (idx 0).
-  // ============================================================
-  const NOMBRES_PROGRAMA_WEB = ['Riego 1', 'Riego 2', 'Riego 3', 'Riego 4', 'Riego Manual', 'Aux 1', 'Aux 2'];
-  const NUM_PROGRAMAS_WEB = NOMBRES_PROGRAMA_WEB.length;
-  const ROTACION_WEB_MS = 10000;
-  let estadosPrograma = {};   // {0:{...}, 1:{...}, 2:{...}} -- último EST: recibido de cada uno
-  let idxMostradoWeb = 0;
-  let tUltimaRotacionWeb = 0;
-
-  function idxRiegoActivoWeb() {
-    for (let i = 0; i < 5; i++) {
-      if (estadosPrograma[i] && estadosPrograma[i].ejecutando) return i;
-    }
-    return -1;
-  }
-
-  function nombreEtapaWeb(estadoInterno, ejecutando, pausado) {
-    if (!ejecutando) return 'Inactivo';
-    if (pausado) return 'Pausado';
-    switch (estadoInterno) {
-      case 1: return 'Regando';
-      case 2: return 'Fertilizando';
-      case 3: return 'Fertilizando';
-      case 4: return 'Regando (post-fert)';
-      default: return 'Inactivo';
-    }
-  }
-
-  function formatoMinSeg(totalSeg) {
-    if (totalSeg < 0) return '--';
-    const m = Math.floor(totalSeg / 60);
-    const s = totalSeg % 60;
-    return `${m}:${String(s).padStart(2, '0')}`;
-  }
-
-  function procesarRespuestaEstado(msg) {
-    // EST:idx:ejecutando:programa:sector:estado_interno:litros_agua:litros_fert:falla_fert:pausado:transcurrido_seg:restante_seg:alerta
-    const p = msg.split(':');
-    const idx = parseInt(p[1], 10);
-    estadosPrograma[idx] = {
-      ejecutando: p[2] === '1',
-      sector: parseInt(p[4], 10),
-      estadoInterno: parseInt(p[5], 10),
-      litrosAgua: parseFloat(p[6]),
-      fallaFert: p[8] === '1',
-      pausado: p[9] === '1',
-      transcurridoSeg: parseInt(p[10], 10),
-      restanteSeg: parseInt(p[11], 10)
-    };
-    actualizarRotacionWeb();
-    renderTarjetaEstadoWeb();
-    actualizarLogosPorEstado();
-  }
-
-  function actualizarLogosPorEstado() {
-    for (let i = 0; i < NUM_PROGRAMAS_WEB; i++) {
-      if (!estadosPrograma[i]) return;
-    }
-    for (const n in salidasInfo) {
-      const info = salidasInfo[n];
-      if (info.tipo === 'BOMBA') continue;
-      let estado = 'inactivo';
-      let manejado = false;
-      for (let i = 0; i < NUM_PROGRAMAS_WEB; i++) {
-        const est = estadosPrograma[i];
-        if (!est || !est.ejecutando) continue;
-        if (i < 5) {
-          if (info.tipo === 'RIEGO' && info.sectorAsoc === est.sector + 1) {
-            estado = est.pausado ? 'alerta' : (est.estadoInterno >= 2 ? 'fertilizando' : 'activo');
-            manejado = true; break;
-          }
-          if (info.tipo === 'BOMBA_INY' && est.estadoInterno >= 2) { estado = 'fertilizando'; manejado = true; break; }
-          if (info.tipo === 'VALV_INY' && est.estadoInterno >= 2) { estado = 'fertilizando'; manejado = true; break; }
-        } else {
-          if (info.tipo === 'AUX' && info.sectorAsoc === est.sector + 1) { estado = 'activo'; manejado = true; break; }
-        }
-      }
-      actualizarSalida(parseInt(n), info.tipo, estado);
-    }
-    const hayRiegoActivo = Array.from({length: 5}, (_, i) => estadosPrograma[i])
-      .some(est => est && est.ejecutando);
-    for (const n in salidasInfo) {
-      if (salidasInfo[n].tipo === 'BOMBA') {
-        actualizarSalida(parseInt(n), 'BOMBA', hayRiegoActivo ? 'activo' : 'inactivo');
-      }
-    }
-  }
-
-  function actualizarRotacionWeb() {
-    const activos = [];
-    for (let i = 0; i < NUM_PROGRAMAS_WEB; i++) {
-      if (estadosPrograma[i] && estadosPrograma[i].ejecutando) activos.push(i);
-    }
-    if (activos.length === 0) { idxMostradoWeb = 0; return; }
-    if (!activos.includes(idxMostradoWeb)) {
-      idxMostradoWeb = activos[0];
-      tUltimaRotacionWeb = Date.now();
-      return;
-    }
-    if (activos.length > 1 && (Date.now() - tUltimaRotacionWeb >= ROTACION_WEB_MS)) {
-      tUltimaRotacionWeb = Date.now();
-      const pos = activos.indexOf(idxMostradoWeb);
-      idxMostradoWeb = activos[(pos + 1) % activos.length];
-    }
-  }
-
-  function renderTarjetaEstadoWeb() {
-    const est = estadosPrograma[idxMostradoWeb];
-    document.getElementById('tarjetaEstadoTitulo').textContent = NOMBRES_PROGRAMA_WEB[idxMostradoWeb];
-
-    if (!est) {
-      document.getElementById('tarjetaEstadoEstado').textContent = '--';
-      document.getElementById('tarjetaEstadoSector').textContent = '--';
-      document.getElementById('tarjetaEstadoTranscurrido').textContent = '--';
-      document.getElementById('tarjetaEstadoRestante').textContent = '--';
-    } else {
-      const estadoEl = document.getElementById('tarjetaEstadoEstado');
-      const etapa = nombreEtapaWeb(est.estadoInterno, est.ejecutando, est.pausado);
-      estadoEl.textContent = etapa;
-      if (est.pausado) {
-        estadoEl.style.cssText = 'background:#E24C4C; color:white; padding:2px 8px; border-radius:4px; font-weight:700;';
-      } else {
-        estadoEl.style.cssText = '';
-      }
-      document.getElementById('tarjetaEstadoSector').textContent = est.ejecutando ? (() => { const k = Object.keys(salidasInfo).find(n => salidasInfo[n].sectorAsoc === est.sector + 1 && salidasInfo[n].tipo === 'RIEGO'); return k ? salidasInfo[k].nombre : (est.sector + 1); })() : '--';
-      document.getElementById('tarjetaEstadoTranscurrido').textContent =
-        est.ejecutando ? formatoMinSeg(est.transcurridoSeg) : '--';
-      document.getElementById('tarjetaEstadoRestante').textContent =
-        est.ejecutando ? formatoMinSeg(est.restanteSeg) : '--';
-    }
-
-    const filaCaudal = document.getElementById('filaCaudalWeb');
-    if (idxMostradoWeb < 5) {
-      filaCaudal.style.display = 'flex';
-      document.getElementById('tarjetaEstadoCaudal').textContent =
-        est ? `${est.litrosAgua.toFixed(2)} L` : '--';
-    } else {
-      filaCaudal.style.display = 'none';
-    }
-
-    // Botón Pausar/Reanudar -- refleja el programa de riego que esté
-    // realmente corriendo (cualquiera de los 5), no uno fijo.
-    const idxRiegoActivo = idxRiegoActivoWeb();
-    const riego = idxRiegoActivo >= 0 ? estadosPrograma[idxRiegoActivo] : null;
-    const btnPausar = document.getElementById('btnPausarWeb');
-    if (riego && riego.pausado) {
-      btnPausar.textContent = 'Reanudar Riego';
-      btnPausar.classList.add('en-pausa');
-    } else {
-      btnPausar.textContent = 'Pausar Riego';
-      btnPausar.classList.remove('en-pausa');
-    }
-
-    // Botón Detener todo -- rojo si Riego, Aux1 o Aux2 está corriendo
-    const algunoCorriendo = Array.from({length: NUM_PROGRAMAS_WEB}, (_, i) => i)
-      .some(i => estadosPrograma[i] && estadosPrograma[i].ejecutando);
-    document.getElementById('btnDetenerTodoWeb').classList.toggle('activo', algunoCorriendo);
-  }
-
-  function inicializarControlesEstado() {
-    document.getElementById('btnPausarWeb').addEventListener('click', () => {
-      if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-      const idxRiegoActivo = idxRiegoActivoWeb();
-      const riego = idxRiegoActivo >= 0 ? estadosPrograma[idxRiegoActivo] : null;
-      publicarComandoOperador((riego && riego.pausado) ? 'REANUDAR' : 'PAUSAR');
-    });
-    document.getElementById('btnSaltarWeb').addEventListener('click', () => {
-      if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-      publicarComandoOperador('SALTAR');
-    });
-    document.getElementById('btnDetenerTodoWeb').addEventListener('click', () => {
-      if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-      publicarComandoOperador('DETENERTODO');
-    });
-  }
-
-  // ============================================================
-  // Historial: Alertas y Últimos Riegos (últimas 50, buffer circular
-  // en el equipo). Se cargan solo al desplegar la tarjeta (no en cada
-  // carga de página) para no saturar de mensajes MQTT innecesarios.
-  // ============================================================
-  let alertasData = {};       // idx -> {timestamp, programa, sector, mensaje}
-  let alertasCountEsperado = null;
-  let registrosData = {};     // idx -> {timestamp, programa, sector, litrosAgua, litrosFert, conFalla, duracionSeg}
-  let registrosCountEsperado = null;
-
-  function formatoFechaHora(timestampSeg) {
-    if (!timestampSeg) return 'Fecha desconocida';
-    return new Date(timestampSeg * 1000).toLocaleString('es-CL');
-  }
-
-  function inicializarSeccionesHistorial() {
-    const cabeceraAlertas = document.getElementById('cabeceraAlertas');
-    const seccionAlertas = document.getElementById('seccionAlertas');
-    cabeceraAlertas.addEventListener('click', () => {
-      const yaAbierta = seccionAlertas.classList.contains('abierta');
-      seccionAlertas.classList.toggle('abierta');
-      if (!yaAbierta) cargarAlertas();
-    });
-
-    const cabeceraHistorial = document.getElementById('cabeceraHistorial');
-    const seccionHistorial = document.getElementById('seccionHistorial');
-    cabeceraHistorial.addEventListener('click', () => {
-      const yaAbierta = seccionHistorial.classList.contains('abierta');
-      seccionHistorial.classList.toggle('abierta');
-      if (!yaAbierta) cargarHistorial();
-    });
-  }
-
-  function cargarAlertas() {
-    if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-    alertasData = {};
-    alertasCountEsperado = null;
-    document.getElementById('listaAlertas').innerHTML = '<p class="mensaje-cargando">Cargando…</p>';
-    publicarComandoOperador('GETALERTASCOUNT');
-  }
-
-  function cargarHistorial() {
-    if (!publicarComandoOperador) { mostrarToast('Sin conexión aún.'); return; }
-    registrosData = {};
-    registrosCountEsperado = null;
-    document.getElementById('listaHistorial').innerHTML = '<p class="mensaje-cargando">Cargando…</p>';
-    publicarComandoOperador('GETREGISTROSCOUNT');
-  }
-
-  function procesarRespuestaAlerta(msg) {
-    if (msg.startsWith('ALERTCOUNT:')) {
-      const count = parseInt(msg.split(':')[1], 10);
-      alertasCountEsperado = count;
-      if (count === 0) {
-        document.getElementById('listaAlertas').innerHTML = '<p class="mensaje-cargando">Sin alertas registradas.</p>';
-        return;
-      }
-      for (let i = 0; i < count; i++) publicarComandoOperador(`GETALERTAS:${i}`);
-      return;
-    }
-    if (msg.startsWith('ALERT:')) {
-      const p = msg.split(':');
-      const idx = parseInt(p[1], 10);
-      // ALERT:n:timestamp:programa:sector:mensaje -- el mensaje se
-      // reconstruye desde el índice 5 por si contuviera ":" (no debería,
-      // pero por seguridad no se corta ahí).
-      const mensaje = p.slice(5).join(':');
-      alertasData[idx] = {
-        timestamp: parseInt(p[2], 10),
-        programa: parseInt(p[3], 10),
-        sector: parseInt(p[4], 10),
-        mensaje: mensaje
-      };
-      renderAlertas();
-    }
-  }
-
-  function procesarRespuestaHistorial(msg) {
-    if (msg.startsWith('REGCOUNT:')) {
-      const count = parseInt(msg.split(':')[1], 10);
-      registrosCountEsperado = count;
-      if (count === 0) {
-        document.getElementById('listaHistorial').innerHTML = '<p class="mensaje-cargando">Sin riegos registrados.</p>';
-        return;
-      }
-      for (let i = 0; i < count; i++) publicarComandoOperador(`GETREGISTROS:${i}`);
-      return;
-    }
-    if (msg.startsWith('REG:')) {
-      const p = msg.split(':');
-      const idx = parseInt(p[1], 10);
-      registrosData[idx] = {
-        timestamp: parseInt(p[2], 10),
-        programa: parseInt(p[3], 10),
-        sector: parseInt(p[4], 10),
-        litrosAgua: parseFloat(p[5]),
-        litrosFert: parseFloat(p[6]),
-        conFalla: p[7] === '1',
-        duracionSeg: parseInt(p[8], 10)
-      };
-      renderHistorial();
-    }
-  }
-
-  function renderAlertas() {
-    if (alertasCountEsperado === null) return;
-    const idxs = Object.keys(alertasData).map(Number);
-    if (idxs.length < alertasCountEsperado) return;  // esperar a que lleguen todas
-    // Más reciente primero (los índices guardados vienen del más antiguo
-    // al más nuevo, así que se recorren al revés)
-    idxs.sort((a, b) => b - a);
-    const html = idxs.map(i => {
-      const a = alertasData[i];
-      const nombreProg = NOMBRES_PROGRAMA_WEB[a.programa] || `Prog ${a.programa}`;
-      return `
-        <div class="fila-historial con-falla">
-          <div class="linea1">${a.mensaje}</div>
-          <div class="linea2">${nombreProg} — Sector ${a.sector + 1} · ${formatoFechaHora(a.timestamp)}</div>
-        </div>`;
-    }).join('');
-    document.getElementById('listaAlertas').innerHTML = html;
-  }
-
-  function renderHistorial() {
-    if (registrosCountEsperado === null) return;
-    const idxs = Object.keys(registrosData).map(Number);
-    if (idxs.length < registrosCountEsperado) return;
-    idxs.sort((a, b) => b - a);
-    const html = idxs.map(i => {
-      const r = registrosData[i];
-      const nombreProg = NOMBRES_PROGRAMA_WEB[r.programa] || `Prog ${r.programa}`;
-      const dur = formatoMinSeg(r.duracionSeg);
-      const claseFalla = r.conFalla ? 'con-falla' : '';
-      const etiquetaFalla = r.conFalla ? ' (con falla)' : '';
-      return `
-        <div class="fila-historial ${claseFalla}">
-          <div class="linea1">${nombreProg} — Sector ${r.sector + 1}${etiquetaFalla}</div>
-          <div class="linea2">${formatoFechaHora(r.timestamp)} · ${dur} · ${r.litrosAgua.toFixed(2)} L agua${r.litrosFert > 0 ? ` · ${r.litrosFert.toFixed(2)} L fert` : ''}</div>
-        </div>`;
-    }).join('');
-    document.getElementById('listaHistorial').innerHTML = html;
-  }
-
-  function procesarRespuestaHora(msg) {
-    // HORA:dd:mm:aaaa:hh:mm:ss
-    const p = msg.split(':');
-    const dia = parseInt(p[1], 10), mes = parseInt(p[2], 10), anio = parseInt(p[3], 10);
-    const hh = parseInt(p[4], 10), mm = parseInt(p[5], 10), ss = parseInt(p[6], 10);
-
-    const horaEquipo = new Date(anio, mes - 1, dia, hh, mm, ss);
-    const horaTexto = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
-
-    const diffSeg = Math.round((Date.now() - horaEquipo.getTime()) / 1000);
-    const el = document.getElementById('horaEquipoTexto');
-    if (Math.abs(diffSeg) > 60) {
-      el.textContent = `${horaTexto} ⚠️ desfasada ${diffSeg > 0 ? diffSeg : -diffSeg}s vs tu navegador`;
-      el.style.color = '#E24C4C';
-    } else {
-      el.textContent = `${horaTexto} (sincronizada)`;
-      el.style.color = '';
-    }
-  }
-
-  function conectarMQTT(unidad, deviceId) {
-    const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
-      username: 'pluo_web_client',
-      password: 'Pluo2610',
-      clientId: 'web_equipo_' + Math.random().toString(16).slice(2)
-    });
-
-    const timeouts = {};
-
-    tokenOperador = unidad.token_operador || null;
-    publicarComandoOperador = (comando) => {
-      if (!tokenOperador) { mostrarToast('Este equipo no tiene token_operador configurado.'); return; }
-      client.publish(`pluo/${deviceId}/cmd`, `${tokenOperador}:${comando}`);
+  window.guardarProg = async function() {
+    const prog = programas[String(progActual)];
+    prog.activo = document.getElementById('chkActivo')?.checked || false;
+    prog.hora_inicio = document.getElementById('inputHora')?.value || '00:00';
+    prog.fertilizacion = {
+      agua_antes: parseInt(document.getElementById('fert-antes')?.value) || 0,
+      litros: parseInt(document.getElementById('fert-litros')?.value) || 0,
+      agua_despues: parseInt(document.getElementById('fert-despues')?.value) || 0
     };
 
-    client.on('connect', () => {
-      puntoConexion.classList.add('conectado');
-      client.subscribe(`pluo/${deviceId}/resp`);
+    const chips = document.querySelectorAll('.dia-chip');
+    prog.dias = [...chips].map(c => c.classList.contains('sel'));
 
-      for (let i = 1; i <= NUM_SALIDAS; i++) {
-        client.publish(`pluo/${deviceId}/cmd`, `${unidad.token_observador}:GETSALIDA:${i}`);
-        timeouts[i] = setTimeout(() => {
-          actualizarSalida(i, null, 'sin_datos');
-        }, 4000);
-      }
-
-      // Estado de los 7 programas -- se pide de entrada y se refresca
-      // cada 2s (no hay push desde el equipo, solo respuesta a consulta).
-      const pedirEstados = () => {
-        for (let i = 0; i < NUM_PROGRAMAS_WEB; i++) {
-          client.publish(`pluo/${deviceId}/cmd`, `${tokenOperador || unidad.token_observador}:GETESTADO:${i}`);
-        }
-        client.publish(`pluo/${deviceId}/cmd`, `${unidad.token_observador}:GETHORA`);
-      };
-      pedirEstados();
-      setInterval(pedirEstados, 2000);
-    });
-
-    client.on('message', (topic, mensaje) => {
-      const texto = mensaje.toString();
-
-      if (texto.startsWith('PROG:') || texto.startsWith('SEC:')) {
-        procesarRespuestaPrograma(texto);
-        return;
-      }
-      if (texto.startsWith('EST:')) {
-        procesarRespuestaEstado(texto);
-        return;
-      }
-      if (texto.startsWith('ALERTCOUNT:') || texto.startsWith('ALERT:')) {
-        procesarRespuestaAlerta(texto);
-        return;
-      }
-      if (texto.startsWith('REGCOUNT:') || texto.startsWith('REG:')) {
-        procesarRespuestaHistorial(texto);
-        return;
-      }
-      if (texto.startsWith('HORA:')) {
-        procesarRespuestaHora(texto);
-        return;
-      }
-
-    if (texto.startsWith('SAL:')) {
-        // SAL:n:tipo:sector_asoc:nombre:caudal_esperado:estado_on_off
-        const partes = texto.split(':');
-        const n = parseInt(partes[1], 10);
-        const tipo = partes[2];
-        const sectorAsoc = parseInt(partes[3], 10);
-        const nombreSalida = partes[4];
-        const estadoOnOff = partes[6];
-
-        salidasInfo[n] = { tipo, sectorAsoc, nombre: nombreSalida };
-        // Refrescar la lista de sectores del programa que se esté viendo
-        // -- tanto Riego (debe excluir sectores AUX) como Aux1/Aux2 (debe
-        // incluir solo los AUX) dependen de esta info de salidas.
-        construirFilasSectoresPrograma();
-
-        clearTimeout(timeouts[n]);
-
-        const tarjeta = document.getElementById(`salida-${n}`);
-
-        // Salidas sin tipo asignado no se muestran al cliente -- solo
-        // interesan las que realmente están en uso.
-        if (tipo === 'SIN_USAR') {
-          if (tarjeta) tarjeta.style.display = 'none';
-          return;
-        }
-        if (tarjeta) tarjeta.style.display = '';
-
-        const nombreEl = document.getElementById(`nombre-${n}`);
-        if (nombreEl) {
-          nombreEl.textContent = nombreSalida || NOMBRE_POR_TIPO[tipo] || `Salida ${n}`;
-        }
-
-        const activo = (estadoOnOff === '1' || estadoOnOff === 'ON');
-        actualizarSalida(n, tipo, activo ? 'activo' : 'inactivo');
-      }
-    });
-
-    client.on('error', (err) => {
-      console.error('Error MQTT:', err);
-      puntoConexion.classList.remove('conectado');
-    });
-  }
-
-  function actualizarSalida(n, tipo, estado) {
-    const circulo = document.getElementById(`icono-${n}`);
-    const texto = document.getElementById(`estado-${n}`);
-    if (!circulo || !texto) return;
-
-    let color = '#B9C2C6';
-    let etiqueta = 'No activo';
-    let borde = 'none';
-
-    if (estado === 'alerta') {
-      color = '#E24C4C';
-      etiqueta = 'Alerta';
-    } else if (estado === 'fertilizando') {
-      color = COLOR_FERTILIZANDO;
-      etiqueta = 'Fertilizando';
-      borde = 'none';
-    } else if (estado === 'activo') {
-      color = COLOR_POR_TIPO[tipo] || '#2FB65A';
-      etiqueta = 'Activo';
-    } else if (estado === 'sin_datos') {
-      etiqueta = 'Sin datos';
+    for (let s = 1; s <= NUM_SECTORES; s++) {
+      const hab = document.querySelector(`.chk-sec[data-s="${s}"]`)?.checked || false;
+      const h   = parseInt(document.getElementById(`h-${s}`)?.value)||0;
+      const m   = parseInt(document.getElementById(`m-${s}`)?.value)||0;
+      prog.sectores[String(s)] = { habilitado: hab, horas: h, minutos: m };
     }
 
-    circulo.style.background = color;
-    circulo.style.border = borde;
-    if (estado === 'fertilizando') {
-      circulo.innerHTML = tipo ? generarIcono(tipo, COLOR_FERTILIZANDO, '#1976D2') : '';
-    } else {
-      circulo.innerHTML = tipo ? generarIcono(tipo, color) : '';
+    await setDoc(doc(db, 'Unidades', deviceId, 'Programas', String(progActual)), prog);
+
+    const [hh, mm] = (prog.hora_inicio||'00:00').split(':');
+    pub(`SETPROG:${progActual},${prog.activo?1:0},0,${hh||0},${mm||0}`, window.tokenOp);
+    pub(`SETDIAS:${progActual},${prog.dias.map(d=>d?1:0).join(',')}`, window.tokenOp);
+    for (let s = 1; s <= NUM_SECTORES; s++) {
+      const sc = prog.sectores[String(s)];
+      pub(`SETSECTOR:${progActual},${s},${sc.habilitado?1:0},${sc.horas},${sc.minutos}`, window.tokenOp);
     }
-    texto.textContent = etiqueta;
+
+    mostrarToast(`Programa ${progActual} guardado ✓`);
+  };
+
+  /* ---------- UTILS ---------- */
+  function fmtSeg(s) {
+    const m = Math.floor(s/60); const ss = s%60;
+    return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
   }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
 </script>
 
 <script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
