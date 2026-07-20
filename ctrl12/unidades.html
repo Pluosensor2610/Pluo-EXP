@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ctrl12 — Mis Unidades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #1976D2; --azul-claro: #E8F4FB; --teal: #00897B;
+    --verde: #2FB65A; --gris: #B9C2C6; --alerta: #E24C4C;
+    --texto: #1A2B33; --texto-tenue: #6B7C85; --blanco: #FFFFFF; --fondo: #F4F7F9;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; min-height: 100vh; background: var(--fondo); font-family: 'Manrope', sans-serif; color: var(--texto); }
+  header { background: var(--azul); color: var(--blanco); padding: 18px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+  .logo-header { width: 36px; height: 36px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  header .titulos { flex: 1; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+  header p { font-size: 12px; margin: 0; opacity: 0.85; }
+  #btnSalir { background: rgba(255,255,255,0.15); border: none; color: var(--blanco); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Manrope', sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
+  .tarjeta-unidad { background: var(--blanco); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .tarjeta-unidad:active { background: var(--azul-claro); }
+  .indicador { width: 14px; height: 14px; border-radius: 50%; background: var(--gris); flex-shrink: 0; transition: background 0.2s ease; }
+  .indicador.activo { background: var(--verde); }
+  .indicador.alerta { background: var(--alerta); }
+  .info-unidad { flex: 1; min-width: 0; }
+  .info-unidad h3 { margin: 0 0 2px 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info-unidad p { margin: 0; font-size: 13px; color: var(--texto-tenue); font-family: 'IBM Plex Mono', monospace; }
+  .flecha { color: var(--texto-tenue); font-size: 18px; }
+  .mensaje-vacio, .mensaje-cargando { text-align: center; color: var(--texto-tenue); padding: 60px 20px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-header">C12</div>
+  <div class="titulos">
+    <h1>Ctrl12</h1>
+    <p id="correoUsuario">…</p>
+  </div>
+  <button id="btnSalir">Salir</button>
+</header>
+<main>
+  <div id="listaUnidades">
+    <p class="mensaje-cargando">Cargando tus unidades…</p>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
+    authDomain: "pluo-compact-cef5og.firebaseapp.com",
+    projectId: "pluo-compact-cef5og",
+    storageBucket: "pluo-compact-cef5og.firebasestorage.app",
+    messagingSenderId: "443227636027",
+    appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const listaUnidades = document.getElementById('listaUnidades');
+  const correoUsuario = document.getElementById('correoUsuario');
+
+  document.getElementById('btnSalir').addEventListener('click', () => signOut(auth));
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'index.html'; return; }
+    correoUsuario.textContent = user.email;
+    await cargarUnidades(user);
+  });
+
+  // Normaliza un cliente_ref (puede venir como Reference de Firestore o
+  // como string, con o sin "/" inicial) a un formato unico y comparable.
+  function normalizarPath(valor) {
+    let p = valor?.path || (typeof valor === 'string' ? valor : '') || '';
+    if (p.startsWith('/')) p = p.slice(1);
+    return p;
+  }
+
+  async function cargarUnidades(user) {
+    const userSnap = await getDoc(doc(db, 'Users', user.uid));
+    if (!userSnap.exists()) {
+      listaUnidades.innerHTML = '<p class="mensaje-vacio">Sin acceso. Contacta a tu administrador.</p>';
+      return;
+    }
+
+    const clientePath = normalizarPath(userSnap.data().cliente_ref);
+    console.log('DEBUG cliente_ref:', clientePath);
+
+    const snap = await getDocs(collection(db, 'Unidades'));
+    const unidades = [];
+
+    snap.forEach(d => {
+      const data = d.data();
+      const uPath = normalizarPath(data.cliente_ref);
+      console.log('DEBUG unidad:', d.id, 'tipo:', data.tipo, 'ref:', uPath);
+      if (data.tipo === 'ctrl12' && uPath === clientePath) {
+        unidades.push({ id: d.id, ...data });
+      }
+    });
+
+    console.log('DEBUG unidades encontradas:', unidades.length);
+
+    if (unidades.length === 0) {
+      listaUnidades.innerHTML = '<p class="mensaje-vacio">No tienes unidades asociadas todavía.</p>';
+      return;
+    }
+
+    listaUnidades.innerHTML = '';
+    unidades.sort((a,b) => a.id.localeCompare(b.id));
+
+    unidades.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'tarjeta-unidad';
+      div.innerHTML = `
+        <div class="indicador" id="indicador-${u.id}"></div>
+        <div class="info-unidad">
+          <h3>${u.nombre || 'Sin nombre'}</h3>
+          <p id="estado-${u.id}">${u.id} · Consultando…</p>
+        </div>
+        <div class="flecha">›</div>
+      `;
+      div.addEventListener('click', () => {
+        window.location.href = `equipo.html?id=${u.id}`;
+      });
+      listaUnidades.appendChild(div);
+    });
+
+    conectarMQTT(unidades);
+  }
+
+  function conectarMQTT(unidades) {
+    const client = mqtt.connect('wss://e0b71edcce184b74a7a5a87fc9d2b605.s1.eu.hivemq.cloud:8884/mqtt', {
+      username: 'pluo_firmware',
+      password: 'Pluo2012',
+      clientId: 'ctrl12_lista_' + Math.random().toString(16).slice(2)
+    });
+
+    const timeouts = {};
+
+    client.on('connect', () => {
+      unidades.forEach(u => {
+        client.subscribe('ctrl12/' + u.id + '/resp');
+        client.publish('ctrl12/' + u.id + '/cmd', (u.token_observador || 'OBS-CTRL-7f21') + ':GETESTADO');
+        timeouts[u.id] = setTimeout(() => actualizarTarjeta(u.id, 'sin_conexion'), 4000);
+      });
+    });
+
+    client.on('message', (topic, mensaje) => {
+      const deviceId = topic.split('/')[1];
+      const texto = mensaje.toString();
+      if (texto.startsWith('EST:')) {
+        clearTimeout(timeouts[deviceId]);
+        const partes = texto.split(':');
+        const estado = partes[4];
+        const placa2 = partes[11] || 'TIMEOUT';
+        if (placa2 === 'TIMEOUT') actualizarTarjeta(deviceId, 'alerta');
+        else if (estado === '1') actualizarTarjeta(deviceId, 'activo');
+        else actualizarTarjeta(deviceId, 'inactivo');
+      }
+    });
+
+    client.on('error', err => console.error('MQTT error:', err));
+  }
+
+  function actualizarTarjeta(deviceId, estado) {
+    const indicador = document.getElementById('indicador-' + deviceId);
+    const textoEl = document.getElementById('estado-' + deviceId);
+    if (!indicador || !textoEl) return;
+    indicador.className = 'indicador';
+    switch (estado) {
+      case 'activo':    indicador.classList.add('activo'); textoEl.textContent = deviceId + ' · Regando'; break;
+      case 'alerta':    indicador.classList.add('alerta'); textoEl.textContent = deviceId + ' · Placa 2 sin conexión'; break;
+      case 'sin_conexion': textoEl.textContent = deviceId + ' · Sin conexión'; break;
+      default:          textoEl.textContent = deviceId + ' · No activo';
+    }
+  }
+</script>
+
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
+
+</body>
+</html>
