@@ -423,6 +423,14 @@
       mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
       pub('GETESTADO');
       setInterval(() => pub('GETESTADO'), 3000);
+      
+      // Al conectar tras reset: re-guardar config
+      console.log('[Sync] Re-guardando configuración...');
+      setTimeout(async () => {
+        await guardarProg();
+        await new Promise(r => setTimeout(r, 500));
+        await guardarSalidas();
+      }, 500);
     });
 
     mqttClient.on('message', (topic, payload) => {
@@ -919,16 +927,7 @@
 
 </script>
 
-<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js">
-  // Sincronizar: re-envía config al Master tras reset
-  window.sincronizarTodoAlMaster = async function() {
-    console.log('[Sync] Iniciando sincronización...');
-    // Por ahora: solo muestra que se llamó
-    // La web ya envía comandos cuando guardas manualmente
-    console.log('[Sync] Listo - Master recibió SETSECTOR/SETPROG cuando guardaste');
-  };
-
-</script>
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
 
 </body>
 </html>
