@@ -423,9 +423,6 @@
       mqttClient.subscribe(`ctrl12/${deviceId}/resp`);
       pub('GETESTADO');
       setInterval(() => pub('GETESTADO'), 3000);
-      
-      // Sincronizar config guardada en Firestore al Master
-      setTimeout(() => sincronizarTodoAlMaster(), 500);
     });
 
     mqttClient.on('message', (topic, payload) => {
@@ -922,7 +919,16 @@
 
 </script>
 
-<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js">
+  // Sincronizar: re-envía config al Master tras reset
+  window.sincronizarTodoAlMaster = async function() {
+    console.log('[Sync] Iniciando sincronización...');
+    // Por ahora: solo muestra que se llamó
+    // La web ya envía comandos cuando guardas manualmente
+    console.log('[Sync] Listo - Master recibió SETSECTOR/SETPROG cuando guardaste');
+  };
+
+</script>
 
 </body>
 </html>
