@@ -1,0 +1,12 @@
+{
+  "name": "Pluo",
+  "short_name": "Pluo",
+  "description": "Control de riego CTRL12",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F7F9",
+  "theme_color": "#1976D2",
+  "icons": []
+}
