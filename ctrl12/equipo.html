@@ -458,6 +458,15 @@
       pub('GETESTADO');
       setInterval(() => pub('GETESTADO'), 3000);
       
+      // ✓ PUBLICAR nombres de sectores a pantalla (al conectar MQTT)
+      for (let s = 1; s <= NUM_SECTORES; s++) {
+        if (salidas[String(s)]) {
+          const nombre = salidas[String(s)].nombre || `Sector ${s}`;
+          const tipo = salidas[String(s)].tipo || 0;
+          mqttClient.publish(`ctrl12/${deviceId}/resp`, `SAL:${s}:${tipo}:${nombre}`);
+        }
+      }
+      
       // Al conectar tras reset: re-guardar config
       console.log('[Sync] Re-guardando configuración...');
       setTimeout(async () => {
@@ -502,6 +511,10 @@
       aux1: { enUso: p[20]==='1', programa: parseInt(p[21])||0, salida: parseInt(p[22])||0, elapsed: parseInt(p[23])||0, durTotal: parseInt(p[24])||0 }
     };
     actualizarEstadoUI();
+    // ✓ REPUBLICAR a pantalla (CrowPanel recibe estado en tiempo real desde web)
+    if (mqttClient && mqttClient.isConnected && mqttClient.isConnected()) {
+      mqttClient.publish(`ctrl12/${deviceId}/resp`, msg);
+    }
   }
 
   /* ---------- RENDER ---------- */
