@@ -148,15 +148,10 @@
     background: var(--blanco); border-radius: 12px;
     margin-top: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden;
   }
-  .seccion .cabecera {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; cursor: pointer; user-select: none;
-  }
-  .seccion .cabecera h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-tenue); margin: 0; }
-  .seccion .flecha { color: var(--texto-tenue); font-size: 14px; transition: transform 0.2s; }
-  .seccion.abierta .flecha { transform: rotate(180deg); }
-  .seccion .cuerpo { display: none; padding: 0 16px 16px; }
-  .seccion.abierta .cuerpo { display: block; }
+  .seccion { display: none; }
+  .seccion.activo { display: block; }
+  .seccion .cabecera { display: none; }
+  .seccion .cuerpo { display: block; padding: 0 16px 16px; }
 
   /* PROGRAMAS */
   .tabs-prog { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
