@@ -237,6 +237,7 @@
   .btns-prog { display: flex; gap: 8px; margin-top: 12px; }
   .btn-guardar { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
   .btn-iniciar-prog { flex: 1; padding: 11px; background: var(--azul); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
+  .btn-detener-prog { flex: 1; padding: 11px; background: var(--alerta); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; }
 
   /* HISTORIAL */
   .fila-historial { padding: 10px 0; border-bottom: 1px solid #F0F0F0; }
@@ -879,6 +880,7 @@
       <div class="btns-prog">
         <button class="btn-guardar" onclick="guardarProg()">Guardar</button>
         <button class="btn-iniciar-prog" onclick="pub('INICIAR:${progActual}', window.tokenOp); mostrarToast('Iniciando programa ${progActual}…')">Iniciar ahora</button>
+        <button class="btn-detener-prog" onclick="pub('DETENERPROG:${progActual}', window.tokenOp); mostrarToast('Deteniendo programa ${progActual}…')">Detener</button>
       </div>
     `;
   }
