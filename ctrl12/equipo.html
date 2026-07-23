@@ -334,6 +334,7 @@
   const TIPOS_SALIDA = ['Sector de Riego','Bomba riego','Auxiliar','Bomba Inyectora','Válvula Fertilizante','Sin asignar'];
   const TIPO_SECTOR_RIEGO = 0;
   const TIPO_BOMBA_RIEGO = 1;
+  const TIPO_AUXILIAR = 2;
   const TIPO_BOMBA_INYECTORA = 3;
   const TIPO_VALVULA_FERT = 4;
   const TIPO_SIN_ASIGNAR = 5;
@@ -377,6 +378,14 @@
     renderUI();
     conectarMQTT();
   });
+
+  // Alterna cada 3s entre mostrar el sector de riego activo y el/los
+  // auxiliar(es) activo(s) en la tarjeta de Estado.
+  let mostrarAuxEnEstado = false;
+  setInterval(() => {
+    mostrarAuxEnEstado = !mostrarAuxEnEstado;
+    actualizarEstadoUI();
+  }, 3000);
 
   /* ---------- FIRESTORE ---------- */
   async function cargarDatos() {
@@ -487,7 +496,9 @@
       placa2:   p[11]||'TIMEOUT',
       hora:     p[12]||'00:00',
       sectorTrans: parseInt(p[13])||0,
-      fertilizando: p[14]==='1'
+      fertilizando: p[14]==='1',
+      aux0: { enUso: p[15]==='1', programa: parseInt(p[16])||0, salida: parseInt(p[17])||0, elapsed: parseInt(p[18])||0, durTotal: parseInt(p[19])||0 },
+      aux1: { enUso: p[20]==='1', programa: parseInt(p[21])||0, salida: parseInt(p[22])||0, elapsed: parseInt(p[23])||0, durTotal: parseInt(p[24])||0 }
     };
     actualizarEstadoUI();
   }
@@ -640,9 +651,20 @@
     const sectorNombre = e.sector > 0 ? (salidas[String(e.sector)]?.nombre || `Sector ${e.sector}`) : '—';
     const pausaHTML = e.pausa ? `<div class="fila-estado"><span>Pausa</span><span class="pausa-alerta" style="color: #fff !important;">PAUSADO</span></div>` : '';
 
+    // Nombres de las salidas auxiliares actualmente activas (0, 1 o 2 slots)
+    const auxActivos = [e.aux0, e.aux1]
+      .filter(a => a && a.enUso && a.salida > 0)
+      .map(a => salidas[String(a.salida)]?.nombre || `Auxiliar ${a.salida}`);
+    const auxTexto = auxActivos.length ? auxActivos.join(', ') : '—';
+
+    // Fila que alterna cada 3s entre Sector de riego y Auxiliar(es) activo(s)
+    const filaAlternante = mostrarAuxEnEstado
+      ? `<div class="fila-estado"><span>Auxiliar${auxActivos.length>1?'es':''} activo${auxActivos.length>1?'s':''}</span><span style="color:#000">${auxTexto}</span></div>`
+      : `<div class="fila-estado"><span>Sector activo</span><span style="color:#000">${sectorNombre}</span></div>`;
+
     el.innerHTML = `
       <div class="fila-estado"><span>Estado</span><span>${estados[e.estado]||'?'}</span></div>
-      <div class="fila-estado"><span>Sector activo</span><span>${sectorNombre}</span></div>
+      ${filaAlternante}
       <div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>
       <div class="fila-estado"><span>Transcurrido</span><span>${fmtSeg(e.elapsed)}</span></div>
       <div class="fila-estado"><span>Restante</span><span>${fmtSeg(rest)}</span></div>
@@ -683,8 +705,17 @@
       const esSectorTraslape = s === e.sectorTrans && e.sectorTrans > 0 && e.estado === 1;
       const bombaActiva = esBomba && e.estado === 1;
       const fertilizadorActivo = esFertilizador && e.fertilizando && e.estado === 1;
+      const esAuxiliar = tipo === TIPO_AUXILIAR;
+      const auxiliarActivo = esAuxiliar && (
+        (e.aux0 && e.aux0.enUso && e.aux0.salida === s) ||
+        (e.aux1 && e.aux1.enUso && e.aux1.salida === s)
+      );
 
-      if (fertilizadorActivo) {
+      if (auxiliarActivo) {
+        circulo.style.background = '#000';
+        etxt.textContent = 'Activo';
+        if (anillo) anillo.style.strokeDashoffset = 0;
+      } else if (fertilizadorActivo) {
         circulo.style.background = 'var(--amarillo)';
         etxt.textContent = 'Fertilizando';
         if (anillo) anillo.style.strokeDashoffset = 0;
