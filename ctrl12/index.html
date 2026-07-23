@@ -1,60 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1976D2">
+<meta name="description" content="Control de riego CTRL12">
 <title>Pluo Login</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body { font-family: Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #1976D2; }
-.box { background: white; padding: 40px; border-radius: 8px; width: 350px; }
-input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-button { width: 100%; padding: 10px; background: #1976D2; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-.error { color: red; font-size: 12px; margin-top: 10px; }
+  :root {
+    --azul:       #1976D2;
+    --teal:       #00897B;
+    --verde-ws:   #25D366;
+    --gris:       #B9C2C6;
+    --texto:      #1A2B33;
+    --texto-tenue:#6B7C85;
+    --blanco:     #FFFFFF;
+    --fondo:      #F4F7F9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Manrope', sans-serif; 
+    background: var(--fondo); 
+    color: var(--texto); 
+    min-height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+  }
+
+  .login-container {
+    width: 100%; 
+    max-width: 400px; 
+    padding: 20px; 
+    margin: 0 auto;
+  }
+
+  .login-card {
+    background: var(--blanco);
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .logo-wrapper {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .logo-wrapper h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--azul);
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    margin-bottom: 6px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gris);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Manrope', sans-serif;
+    outline: none;
+  }
+
+  .form-group input:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 10px;
+    margin-top: 24px;
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    text-transform: uppercase;
+  }
+
+  .btn-login:hover {
+    background: #1565C0;
+  }
+
+  .btn-login:active {
+    transform: scale(0.98);
+  }
+
+  .error-msg {
+    color: #E24C4C;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .error-msg.visible {
+    display: block;
+  }
 </style>
 </head>
 <body>
-<div class="box">
-<h2>Pluo Login</h2>
-<form id="login">
-<input type="email" id="email" placeholder="Email" required>
-<input type="password" id="password" placeholder="Password" required>
-<button type="submit">Ingresar</button>
-<div class="error" id="error"></div>
-</form>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-wrapper">
+      <h1>Pluo</h1>
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Correo</label>
+        <input type="email" id="email" name="email" placeholder="tu@correo.com" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+      <button type="submit" class="btn-login">Ingresar</button>
+    </form>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+
 <script>
-firebase.initializeApp({
-  apiKey: "AIzaSyBSIO3eWIlMTtea1j6aQGuW9W-wF6r-Zdk",
-  authDomain: "pluo-compact-cef5og.firebaseapp.com",
-  projectId: "pluo-compact-cef5og",
-  storageBucket: "pluo-compact-cef5og.firebasestorage.app",
-  messagingSenderId: "443227636027",
-  appId: "1:443227636027:web:c8459adcd92cec1d23f71e"
-});
+  const firebaseConfig = {
+    apiKey: "AIzaSyDfCrQFIpRXYpQG6rEhp4-Gz5DuDfNCbh8",
+    authDomain: "pluo-compact-cef5og.firebaseapp.com",
+    projectId: "pluo-compact-cef5og",
+    storageBucket: "pluo-compact-cef5og.appspot.com",
+    messagingSenderId: "965203815635",
+    appId: "1:965203815635:web:b93b89fcaa9ece3e26f2fc"
+  };
 
-const auth = firebase.auth();
-const form = document.getElementById('login');
-const errorDiv = document.getElementById('error');
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-auth.onAuthStateChanged(function(user) {
-  if (user) {
-    window.location.href = 'unidades.html';
-  }
-});
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
 
-form.addEventListener('submit', function(e) {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  
-  auth.signInWithEmailAndPassword(email, password).then(function() {
-    window.location.href = 'unidades.html';
-  }).catch(function(error) {
-    errorDiv.textContent = 'Email o contrasena incorrectos';
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      window.location.href = './unidades.html';
+    } catch (err) {
+      errorMsg.textContent = 'Correo o contraseña incorrectos';
+      errorMsg.classList.add('visible');
+    }
   });
-});
+
+  auth.onAuthStateChanged(user => {
+    if (user) window.location.href = './unidades.html';
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  }
 </script>
+
 </body>
 </html>
