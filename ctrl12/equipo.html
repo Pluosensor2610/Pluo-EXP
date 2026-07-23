@@ -896,7 +896,7 @@
         console.error(`[Firestore] Error guardando salida ${s}:`, err);
         // Continuar aunque Firestore falle -- el ESP32 debe recibir el comando igual
       }
-      pub(`SETSALIDA:${s},${tipo}`, window.tokenOp);
+      pub(`SETSALIDA:${s},${tipo},${nombre}`, window.tokenOp);
     }
 
     const litrosAgua = parseFloat(document.getElementById('caudal-agua')?.value) || 0;
