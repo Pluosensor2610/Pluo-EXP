@@ -925,61 +925,9 @@
     setTimeout(() => t.classList.remove('visible'), 2500);
   }
 
-
-  // ===== NAVEGACION TABS =====
-  window.showTab = function(tab) {
-    // Ocultar todas
-    document.getElementById('equipo').style.display = 'none';
-    document.getElementById('salidas').style.display = 'none';
-    document.getElementById('historial').style.display = 'none';
-    
-    // Limpiar tabs
-    document.getElementById('tab-equipo').style.color = '#6B7C85';
-    document.getElementById('tab-equipo').style.borderBottomColor = 'transparent';
-    document.getElementById('tab-salidas').style.color = '#6B7C85';
-    document.getElementById('tab-salidas').style.borderBottomColor = 'transparent';
-    document.getElementById('tab-historial').style.color = '#6B7C85';
-    document.getElementById('tab-historial').style.borderBottomColor = 'transparent';
-    
-    // Mostrar seleccionada
-    document.getElementById(tab).style.display = 'block';
-    document.getElementById('tab-' + tab).style.color = '#1976D2';
-    document.getElementById('tab-' + tab).style.borderBottomColor = '#1976D2';
-    
-    if (tab === 'historial') {
-      pub('GETREGISTROS', window.tokenObs);
-    }
-  };
-
 </script>
 
-<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js">
-  // ===== NAVEGACION TABS =====
-  window.showTab = function(tab) {
-    // Ocultar todas
-    document.getElementById('equipo').style.display = 'none';
-    document.getElementById('salidas').style.display = 'none';
-    document.getElementById('historial').style.display = 'none';
-    
-    // Limpiar tabs
-    document.getElementById('tab-equipo').style.color = '#6B7C85';
-    document.getElementById('tab-equipo').style.borderBottomColor = 'transparent';
-    document.getElementById('tab-salidas').style.color = '#6B7C85';
-    document.getElementById('tab-salidas').style.borderBottomColor = 'transparent';
-    document.getElementById('tab-historial').style.color = '#6B7C85';
-    document.getElementById('tab-historial').style.borderBottomColor = 'transparent';
-    
-    // Mostrar seleccionada
-    document.getElementById(tab).style.display = 'block';
-    document.getElementById('tab-' + tab).style.color = '#1976D2';
-    document.getElementById('tab-' + tab).style.borderBottomColor = '#1976D2';
-    
-    if (tab === 'historial') {
-      pub('GETREGISTROS', window.tokenObs);
-    }
-  };
-
-</script>
+<script src="https://unpkg.com/mqtt@5.10.0/dist/mqtt.min.js"></script>
 
 </body>
 </html>
