@@ -657,15 +657,28 @@
       .map(a => salidas[String(a.salida)]?.nombre || `Auxiliar ${a.salida}`);
     const auxTexto = auxActivos.length ? auxActivos.join(', ') : '—';
 
+    // Programa(s) auxiliar(es) activos (para la fila "Programa" cuando se
+    // esta mostrando el auxiliar en la fila alternante)
+    const auxProgramas = [e.aux0, e.aux1]
+      .filter(a => a && a.enUso)
+      .map(a => a.programa > 0 ? `Prog ${a.programa}` : 'Manual');
+    const auxProgramaTexto = auxProgramas.length ? [...new Set(auxProgramas)].join(', ') : '—';
+
     // Fila que alterna cada 3s entre Sector de riego y Auxiliar(es) activo(s)
     const filaAlternante = mostrarAuxEnEstado
       ? `<div class="fila-estado"><span>Auxiliar${auxActivos.length>1?'es':''} activo${auxActivos.length>1?'s':''}</span><span style="color:#000">${auxTexto}</span></div>`
       : `<div class="fila-estado"><span>Sector activo</span><span style="color:#000">${sectorNombre}</span></div>`;
 
+    // La fila Programa acompaña la alternancia: muestra el programa principal
+    // o el/los programa(s) auxiliar(es), segun lo que se este mostrando arriba.
+    const filaPrograma = mostrarAuxEnEstado
+      ? `<div class="fila-estado"><span>Programa auxiliar</span><span style="color:#000">${auxProgramaTexto}</span></div>`
+      : `<div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>`;
+
     el.innerHTML = `
       <div class="fila-estado"><span>Estado</span><span>${estados[e.estado]||'?'}</span></div>
       ${filaAlternante}
-      <div class="fila-estado"><span>Programa</span><span>${e.programa>0?`Prog ${e.programa}`:'Manual'}</span></div>
+      ${filaPrograma}
       <div class="fila-estado"><span>Transcurrido</span><span>${fmtSeg(e.elapsed)}</span></div>
       <div class="fila-estado"><span>Restante</span><span>${fmtSeg(rest)}</span></div>
       <div class="fila-estado"><span>Hora</span><span>${e.hora}</span></div>
