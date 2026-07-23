@@ -795,7 +795,8 @@
         </div>
         ${[...Array(NUM_SECTORES)].map((_,i) => {
           const s = i+1;
-          if ((salidas[String(s)]?.tipo ?? 0) !== TIPO_SECTOR_RIEGO) return '';
+          const tipoSal = salidas[String(s)]?.tipo ?? 0;
+          if (tipoSal === TIPO_BOMBA_RIEGO || tipoSal === TIPO_BOMBA_INYECTORA || tipoSal === TIPO_VALVULA_FERT || tipoSal === TIPO_SIN_ASIGNAR) return '';
           const sc = sects[String(s)] || { habilitado:false, horas:0, minutos:0 };
           const fert = sc.fert || { activa:false, tipo:0, agua_antes:0, litros:0, agua_despues:0 };
           const nombre = salidas[String(s)]?.nombre || `Sector ${s}`;
